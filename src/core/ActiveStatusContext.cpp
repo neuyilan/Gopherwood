@@ -60,9 +60,10 @@ shared_ptr<ActiveStatus> ActiveStatusContext::openFileActiveStatus(FileId fileId
     return activeStatus;
 }
 
-void ActiveStatusContext::deleteActiveStatus(FileId fileId){
-    if(getFileActiveStatus(fileId)==NULL){
-        THROW(GopherwoodException,"[ActiveStatusContext::deleteActiveStatus]. the context do not contain the active status");
+
+void ActiveStatusContext::removeActiveStatus(FileId fileId){
+    if(getFileActiveStatus(fileId) == NULL){
+        THROW(GopherwoodException, "[ActiveStatusContext::removeActiveStatus]. the context do not contain the active file status");
         return ;
     }
     mActiveStatusMap.erase(fileId.toString());
