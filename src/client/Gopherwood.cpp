@@ -248,8 +248,7 @@ int gwCloseFile(gopherwoodFS fs, gwFile file) {
 }
 
 int gwDeleteFile(gopherwoodFS fs, char *fileName) {
-    fs->getFilesystem().deleteFile(fileName);
-    return -1;
+    return fs->getFilesystem().deleteFile(fileName);
 }
 
 int gwDestroyContext(gopherwoodFS fs) {
