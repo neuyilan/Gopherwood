@@ -34,15 +34,15 @@
 extern "C" {
 #endif
 
-using Gopherwood::exception_ptr ;
-using Gopherwood::Internal::Configuration ;
-using Gopherwood::Internal::InputStream ;
-using Gopherwood::Internal::BlockOutputStream ;
-using Gopherwood::Internal::shared_ptr ;
-using Gopherwood::Internal::File ;
-using Gopherwood::Internal::FileSystem ;
-using Gopherwood::Internal::SetErrorMessage ;
-using Gopherwood::Internal::SetLastException ;
+using Gopherwood::exception_ptr;
+using Gopherwood::Internal::Configuration;
+using Gopherwood::Internal::InputStream;
+using Gopherwood::Internal::BlockOutputStream;
+using Gopherwood::Internal::shared_ptr;
+using Gopherwood::Internal::File;
+using Gopherwood::Internal::FileSystem;
+using Gopherwood::Internal::SetErrorMessage;
+using Gopherwood::Internal::SetLastException;
 
 struct GWFileSystemInternalWrapper {
 public:
