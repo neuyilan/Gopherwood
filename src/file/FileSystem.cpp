@@ -136,6 +136,14 @@ void FileSystem::eraseActiveFileStatus(FileId fileId){
     mActiveStatusContext->deleteActiveStatus(fileId);
 }
 
+bool FileSystem::checkFileExists(const char *fileName){
+    FileId fileId;
+    shared_ptr<ActiveStatus> status;
+
+    fileId = makeFileId(std::string(fileName));
+    return  mActiveStatusContext->checkFileExists(fileId);
+}
+
 FileSystem::~FileSystem() {
 
 }

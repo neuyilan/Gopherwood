@@ -19,6 +19,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <common/Configuration.h>
 #include "common/Exception.h"
 #include "common/ExceptionInternal.h"
 #include "core/ActiveStatusContext.h"
@@ -65,6 +66,17 @@ void ActiveStatusContext::deleteActiveStatus(FileId fileId){
         return ;
     }
     mActiveStatusMap.erase(fileId.toString());
+}
+
+bool ActiveStatusContext::checkFileExists(FileId fileId){
+    std::stringstream ss;
+    ss << mSharedMemoryContext->getWorkDir() << Configuration::MANIFEST_FOLDER << '/' << fileId.hashcode << '-'
+       << fileId.collisionId;
+    std::string manifestFileName = ss.str();
+    if(access( manifestFileName.c_str(), F_OK ) == -1){
+        return false;
+    }
+    return true;
 }
 
 

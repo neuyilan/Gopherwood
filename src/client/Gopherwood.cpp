@@ -251,6 +251,22 @@ int gwDeleteFile(gopherwoodFS fs, char *fileName) {
     return fs->getFilesystem().deleteFile(fileName);
 }
 
+GWFileInfo *gwStatFile(gopherwoodFS fs, gwFile file){
+    GWFileInfo* gwFileInfo = new GWFileInfo();
+    int64_t retLength = file->getFile().getFileLength();
+    gwFileInfo->fileLength = retLength;
+    LOG(
+            Gopherwood::Internal::INFO,
+            "File size =  %d, gwFileInfo->fileLength=%d.",
+            retLength, gwFileInfo->fileLength);
+    return gwFileInfo;
+}
+
+bool gwCheckFileExist(gopherwoodFS fs, const char *fileName){
+    return fs->getFilesystem().checkFileExists(fileName);
+}
+
+
 int gwDestroyContext(gopherwoodFS fs) {
     try {
         if (fs) {

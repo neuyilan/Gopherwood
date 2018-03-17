@@ -74,6 +74,10 @@ typedef struct GWContextConfig {
     int64_t blockSize;
 } GWContextConfig;
 
+typedef struct FileInfo{
+    tOffset fileLength;
+} GWFileInfo;
+
 /**
  * gwCreateContext - Connect to a gopherwood file system.
  *
@@ -168,6 +172,8 @@ int gwCloseFile(gopherwoodFS fs, gwFile file);
  */
 int gwDeleteFile(gopherwoodFS fs, char *filePath);
 
+bool gwCheckFileExist(gopherwoodFS fs, const char *fileName);
+
 /**
  * gwDestroyContext - free Gopherwood Context resources.
  *
@@ -175,6 +181,8 @@ int gwDeleteFile(gopherwoodFS fs, char *filePath);
  * @return  Returns 0 on success, -1 on error.
  */
 int gwDestroyContext(gopherwoodFS fs);
+
+GWFileInfo *gwStatFile(gopherwoodFS fs, gwFile file);
 
 #ifdef __cplusplus
 }

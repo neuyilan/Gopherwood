@@ -48,6 +48,8 @@ public:
 
     void eraseActiveFileStatus(FileId fileId);
 
+    bool checkFileExists(const char *fileName);
+
     ~FileSystem();
 
 private:

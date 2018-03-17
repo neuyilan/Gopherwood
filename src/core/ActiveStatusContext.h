@@ -44,6 +44,8 @@ public:
     shared_ptr<ActiveStatus> openFileActiveStatus(FileId fileId, bool isWrite);
 
     void deleteActiveStatus(FileId fileId);
+
+    bool checkFileExists(FileId fileId);
     ~ActiveStatusContext();
 
 private:
