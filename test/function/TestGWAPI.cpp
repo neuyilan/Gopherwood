@@ -11,31 +11,49 @@
 #include <sstream>
 #include <cstring>
 
-#include "../../src/client/gopherwood.h"
-//#include "../../src/core/gopherwood.h"
+#include "gopherwood.h"
+
+//#include "../../src/client/gopherwood.h"
 
 using namespace std;
 
+
+char workDir[] = "/ssdfile/hashdataInc/gopherwood/";
+GWContextConfig config;
+
+
+void initConfig() {
+    config.blockSize = 4 * 1 * 1024;;
+    config.numBlocks = 100;
+}
+
+void testGWFormat() {
+    /*1. format the workDir*/
+    gwFormatContext(workDir);
+}
+
 void testGWWrite(std::string fileName) {
-    AccessFileType type = AccessFileType::randomType;
 
-    gopherwoodFS gwFS = gwCreateContext((char *) fileName.c_str());
-    gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), O_CREAT);
-
-    int SIZE = 128;
-
+    /*2. create the context and open the file*/
+    initConfig();
+    gopherwoodFS gwFS = gwCreateContext(workDir, &config);
+    gwFile gwfile = gwOpenFile(gwFS, fileName.c_str(), GW_CREAT | GW_RDWR);
 
 
-    //3. construct the file name
+    /*3. seek the end of the file*/
+    gwSeek(gwFS, gwfile, 0, SEEK_END);
+
+    /*3. construct the  input source file name*/
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/" << fileName;
+    ss << "/ssdfile/hashdataInc/" << fileName;
     std::string filePath = ss.str();
 
-    //4. read data from file
+    /*4. read data from file*/
     std::ifstream infile;
     infile.open(filePath);
 
 
+    int SIZE = 128;
     int totalWriteLength = 0;
     char *buf = new char[SIZE];
     infile.read(buf, SIZE);
@@ -45,15 +63,16 @@ void testGWWrite(std::string fileName) {
         std::cout << "totalWriteLength=" << totalWriteLength << ",readLength="
                   << readLengthIn << std::endl;
         std::cout << "buf=" << buf << std::endl;
-        //5. write data to the gopherwood
-        gwWrite(gwFS, file, buf, readLengthIn);
+        /*5. write data to the gopherwood*/
+        gwWrite(gwFS, gwfile, buf, readLengthIn);
 
         buf = new char[SIZE];
         infile.read(buf, SIZE);
         readLengthIn = infile.gcount();
     }
 
-    gwCloseFile(gwFS, file);
+    /*6. close the file*/
+    gwCloseFile(gwFS, gwfile);
 
     std::cout << "*******END OF WRITE*****, totalWriteLength=" << totalWriteLength << std::endl;
 }
@@ -65,21 +84,22 @@ void writeUtil(char *fileName, char *buf, int size) {
 }
 
 void testGWRead(string fileName) {
-    AccessFileType type = AccessFileType::randomType;
-    gopherwoodFS gwFS = gwCreateContext((char *) fileName.c_str());
-    gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), O_RDONLY);
 
+    /*2. create the context and open the file*/
+    initConfig();
+    gopherwoodFS gwFS = gwCreateContext(workDir, &config);
+    gwFile gwfile = gwOpenFile(gwFS, fileName.c_str(), GW_CREAT | GW_RDONLY);
 
     //3. construct the file name
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/test/" << fileName << "-readCache";
+    ss << "/ssdfile/hashdataInc/" << fileName << "-readCache";
     std::string fileNameForWrite = ss.str();
 
 
     int SIZE = 128;
 
     char *readBuf = new char[SIZE];
-    int readLength = gwRead(gwFS, file, readBuf, SIZE);
+    int readLength = gwRead(gwFS, gwfile, readBuf, SIZE);
 
     int totalLength = 0;
     while (readLength > 0) {
@@ -88,25 +108,24 @@ void testGWRead(string fileName) {
         writeUtil((char *) fileNameForWrite.c_str(), readBuf, readLength);
 
         readBuf = new char[SIZE];
-        readLength = gwRead(gwFS, file, readBuf, SIZE);
+        readLength = gwRead(gwFS, gwfile, readBuf, SIZE);
         std::cout << "**************** readLength =  *******************" << readLength << std::endl;
     }
 
 
-    gwCloseFile(gwFS, file);
+    gwCloseFile(gwFS, gwfile);
 
     std::cout << "*******END OF READ*****, totalLength=" << totalLength << std::endl;
 }
 
 
-void testGWDelete(string fileName) {
-    AccessFileType type = AccessFileType::randomType;
-    gopherwoodFS gwFS = gwCreateContext((char *) fileName.c_str());
-    gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), O_RDONLY);
-    std::cout << "***********START OF DELETE**************" << std::endl;
-    deleteFile(gwFS, file);
-    std::cout << "***********END OF  DELETE**************" << std::endl;
-}
+//void testGWDelete(string fileName) {
+//    gopherwoodFS gwFS = gwCreateContext((char *) fileName.c_str());
+//    gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), O_RDONLY);
+//    std::cout << "***********START OF DELETE**************" << std::endl;
+//    deleteFile(gwFS, file);
+//    std::cout << "***********END OF  DELETE**************" << std::endl;
+//}
 
 
 int main(int agrInt, char **agrStr) {
@@ -123,8 +142,9 @@ int main(int agrInt, char **agrStr) {
 
     int timeCount = 10;
 
-
-    if (strcmp(agrStr[1], "write-1") == 0) {
+    if (strcmp(agrStr[1], "format") == 0) {
+        testGWFormat();
+    } else if (strcmp(agrStr[1], "write-1") == 0) {
         for (int i = 0; i < timeCount; i++) {
             testGWWrite(fileNameArr[0]);
         }
@@ -136,23 +156,20 @@ int main(int agrInt, char **agrStr) {
         for (int i = 0; i < timeCount; i++) {
             testGWWrite(fileNameArr[2]);
         }
-    }
-
-    else if (strcmp(agrStr[1], "read-1") == 0) {
+    } else if (strcmp(agrStr[1], "read-1") == 0) {
         testGWRead(fileNameArr[0]);
     } else if (strcmp(agrStr[1], "read-2") == 0) {
         testGWRead(fileNameArr[1]);
     } else if (strcmp(agrStr[1], "read-3") == 0) {
         testGWRead(fileNameArr[2]);
     }
-
-    else if (strcmp(agrStr[1], "delete-1") == 0) {
-        testGWDelete(fileNameArr[0]);
-    } else if (strcmp(agrStr[1], "delete-2") == 0) {
-        testGWDelete(fileNameArr[1]);
-    } else if (strcmp(agrStr[1], "delete-3") == 0) {
-        testGWDelete(fileNameArr[2]);
-    }
+//    else if (strcmp(agrStr[1], "delete-1") == 0) {
+//        testGWDelete(fileNameArr[0]);
+//    } else if (strcmp(agrStr[1], "delete-2") == 0) {
+//        testGWDelete(fileNameArr[1]);
+//    } else if (strcmp(agrStr[1], "delete-3") == 0) {
+//        testGWDelete(fileNameArr[2]);
+//    }
 
 
 }
