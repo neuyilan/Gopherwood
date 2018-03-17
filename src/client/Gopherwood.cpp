@@ -169,7 +169,8 @@ gwFile gwOpenFile(gopherwoodFS fs, const char *fileName, int flags) {
         if (flags & GW_CREAT)
         {
             file = fs->getFilesystem().CreateFile(fileName, flags, isWrite);
-        } else
+        }
+        else
         {
             file = fs->getFilesystem().OpenFile(fileName, flags, isWrite);
         }
