@@ -34,15 +34,15 @@
 extern "C" {
 #endif
 
-using Gopherwood::exception_ptr;
-using Gopherwood::Internal::Configuration;
-using Gopherwood::Internal::InputStream;
-using Gopherwood::Internal::BlockOutputStream;
-using Gopherwood::Internal::shared_ptr;
-using Gopherwood::Internal::File;
-using Gopherwood::Internal::FileSystem;
-using Gopherwood::Internal::SetErrorMessage;
-using Gopherwood::Internal::SetLastException;
+using Gopherwood::exception_ptr ;
+using Gopherwood::Internal::Configuration ;
+using Gopherwood::Internal::InputStream ;
+using Gopherwood::Internal::BlockOutputStream ;
+using Gopherwood::Internal::shared_ptr ;
+using Gopherwood::Internal::File ;
+using Gopherwood::Internal::FileSystem ;
+using Gopherwood::Internal::SetErrorMessage ;
+using Gopherwood::Internal::SetLastException ;
 
 struct GWFileSystemInternalWrapper {
 public:
@@ -133,7 +133,7 @@ static void handleException(const Gopherwood::exception_ptr &error) {
     }
 }
 
-gopherwoodFS gwCreateContext(char *workDir, GWContextConfig* config) {
+gopherwoodFS gwCreateContext(char *workDir, GWContextConfig *config) {
     gopherwoodFS retVal = NULL;
 
     if (config != NULL) {
@@ -162,16 +162,13 @@ void gwFormatContext(char *workDir) {
 
 gwFile gwOpenFile(gopherwoodFS fs, const char *fileName, int flags) {
     gwFile retVal = NULL;
-    File* file;
+    File *file;
 
     try {
         bool isWrite = (flags & GW_RDWR) || (flags & GW_WRONLY);
-        if (flags & GW_CREAT)
-        {
+        if (flags & GW_CREAT) {
             file = fs->getFilesystem().CreateFile(fileName, flags, isWrite);
-        }
-        else
-        {
+        } else {
             file = fs->getFilesystem().OpenFile(fileName, flags, isWrite);
         }
 
@@ -233,7 +230,9 @@ int gwFlush(gopherwoodFS fs, gwFile file) {
 
 int gwCloseFile(gopherwoodFS fs, gwFile file) {
     try {
+
         file->getFile().close();
+        fs->getFilesystem().eraseActiveFileStatus(file->getFile().getFileName());
         delete file;
         file = NULL;
         return 0;
@@ -245,7 +244,8 @@ int gwCloseFile(gopherwoodFS fs, gwFile file) {
     return -1;
 }
 
-int gwDeleteFile(gopherwoodFS fs, char *filePath) {
+int gwDeleteFile(gopherwoodFS fs, char *fileName) {
+    fs->getFilesystem().deleteFile(fileName);
     return -1;
 }
 

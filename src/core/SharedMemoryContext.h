@@ -61,7 +61,7 @@ public:
     bool activateBucket(FileId fileId, Block& block, int activeId, bool isWrite);
     std::vector<Block> inactivateBuckets(std::vector<Block> &blocks, FileId fileId, int activeId, bool isWrite);
     void updateActiveFileInfo(std::vector<Block> &blocks, FileId fileId);
-
+    std::vector<Block> deleteBuckets(std::vector<Block> &blocks);
     /* evict logic related APIs*/
     std::vector<int32_t> markBucketEvicting(int activeId, int num);
     ShareMemBucket* evictBucketStart(int32_t bucketId, int activeId);

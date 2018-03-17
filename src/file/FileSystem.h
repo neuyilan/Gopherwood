@@ -44,6 +44,10 @@ public:
 
     File* OpenFile(const char *fileName, int flags, bool isWrite);
 
+    int deleteFile(const char *fileName);
+
+    void eraseActiveFileStatus(FileId fileId);
+
     ~FileSystem();
 
 private:
