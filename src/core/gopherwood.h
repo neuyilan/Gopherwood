@@ -146,7 +146,7 @@ tOffset gwSeek(gopherwoodFS fs, gwFile file, tOffset desiredPos, int where);
 int gwCloseFile(gopherwoodFS fs, gwFile file);
 
 
-//int deleteFile(gopherwoodFS fs, gwFile file);
+int deleteFile(gopherwoodFS fs, gwFile file);
 //TODO
 int gwDeleteFile(char *filePath);
 

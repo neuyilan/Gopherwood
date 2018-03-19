@@ -375,7 +375,6 @@ int gwCloseFile(gopherwoodFS fs, gwFile file) {
     return -1;
 }
 
-/*
 int deleteFile(gopherwoodFS fs, gwFile file) {
     try {
         if (file) {
@@ -411,7 +410,7 @@ int deleteFile(gopherwoodFS fs, gwFile file) {
 
     return -1;
 }
-*/
+
 
 //TODO
 int gwDeleteFile(char *filePath) {
