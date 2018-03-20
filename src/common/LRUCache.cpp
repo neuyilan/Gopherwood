@@ -52,7 +52,6 @@ public:
         }
         this->_max_size = newSize;
         return removeVector;
-
     }
 
     std::vector<key_t> put(const key_t &key, const value_t &value) {
