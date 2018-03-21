@@ -44,8 +44,9 @@ public:
     std::vector<key_t> adjustSize(size_t newSize) {
         assert(newSize > 0);
         std::vector<key_t> removeVector;
-        if (newSize < _max_size) {
-            size_t numToRemove = _max_size - newSize;
+        size_t currSize = size();
+        if (newSize < currSize) {
+            size_t numToRemove = currSize - newSize;
             removeVector = removeNumOfKeys(numToRemove);
         } else {
             removeVector = NULL;
