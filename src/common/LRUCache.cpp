@@ -41,9 +41,18 @@ public:
             _max_size(max_size) {
     }
 
-    void adjustSize(size_t newSize) {
+    std::vector<key_t> adjustSize(size_t newSize) {
         assert(newSize > 0);
+        std::vector<key_t> removeVector;
+        if (newSize < _max_size) {
+            size_t numToRemove = _max_size - newSize;
+            removeVector = removeNumOfKeys(numToRemove);
+        } else {
+            removeVector = NULL;
+        }
         this->_max_size = newSize;
+        return removeVector;
+
     }
 
     std::vector<key_t> put(const key_t &key, const value_t &value) {
