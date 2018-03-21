@@ -16,8 +16,6 @@
 using namespace std;
 
 void testGWWrite(std::string fileName) {
-    AccessFileType type = AccessFileType::randomType;
-
     gopherwoodFS gwFS = gwCreateContext();
     gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), O_CREAT);
 
@@ -57,7 +55,7 @@ void testGWWrite(std::string fileName) {
     std::cout << "*******END OF WRITE*****, totalWriteLength=" << totalWriteLength << std::endl;
 
     std::cout << "*******START OF destroyContext*****" << std::endl;
-    int res = destroyContext(gwFS);
+    int res = gwDestroyContext(gwFS);
     std::cout << "*******END OF destroyContext*****,res=" << res << std::endl;
 }
 
@@ -117,7 +115,7 @@ void testGWGetFileInfo(string fileName) {
     gopherwoodFS gwFS = gwCreateContext();
     gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), O_RDONLY);
 
-    FileInfo *fileInfo = getFileInfo(gwFS, file);
+    FileInfo *fileInfo = gwStatFile(gwFS, file);
 
     std::cout << "*****************FILE INFO SIZE =" << fileInfo->fileSize << "*******************" << std::endl;
     gwCloseFile(gwFS, file);
@@ -210,7 +208,7 @@ void testGWMultiFileWithOneGWFS() {
 
 
         std::cout << "*******START OF destroyContext*****" << std::endl;
-        int res = destroyContext(gwFS);
+        int res = gwDestroyContext(gwFS);
         std::cout << "*******END OF destroyContext*****,res=" << res << std::endl;
     }
 
