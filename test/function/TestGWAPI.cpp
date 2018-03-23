@@ -43,7 +43,7 @@ void testGWWrite(std::string fileName) {
 
     /*3. construct the  input source file name*/
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/" << fileName;
+    ss << "/ssdfile/goworkspace/" << fileName;
     std::string filePath = ss.str();
 
     /*4. read data from file*/
@@ -90,7 +90,7 @@ void testGWRead(string fileName) {
 
     //3. construct the file name
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/" << fileName << "-readCache";
+    ss << "/ssdfile/goworkspace/" << fileName << "-readCache";
     std::string fileNameForWrite = ss.str();
 
 
