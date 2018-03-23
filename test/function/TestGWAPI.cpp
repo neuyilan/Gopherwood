@@ -23,6 +23,7 @@ GWContextConfig config;
 void initConfig() {
     config.blockSize = 4 * 1 * 1024;;
     config.numBlocks = 100;
+    config.numPreDefinedConcurrency = 10;
 }
 
 void testGWFormat() {

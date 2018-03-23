@@ -87,11 +87,12 @@ void testWriteExceedQuota(){
 
 int main(int argc, char *argv[])
 {
-//    gwFormatContext(workDir);
+    gwFormatContext(workDir);
 
     GWContextConfig config;
     config.blockSize = 10;
     config.numBlocks = 100;
+    config.numPreDefinedConcurrency = 10;
 
     fs =  gwCreateContext(workDir, &config);
 

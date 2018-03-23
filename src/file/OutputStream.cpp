@@ -37,6 +37,9 @@ void OutputStream::updateBlockStream() {
 
     /* Update the BlockInfo of the BlockOutputStream */
     mBlockOutputStream->setBlockInfo(mStatus->getCurBlockInfo());
+
+    /* Update the position*/
+    mPos = mStatus->getPosition();
 }
 
 void OutputStream::write(const char *buffer, int64_t length, bool isSeek) {
@@ -44,6 +47,8 @@ void OutputStream::write(const char *buffer, int64_t length, bool isSeek) {
     int64_t bytesWritten = 0;
     bool needUpdate = true;
 
+    LOG(INFO, "[1. qihouliang. OutputStream::write]     |"
+            "Write to local space, mPos=%d",mPos);
     /* write the buffer, switch target block if needed */
     while (bytesToWrite > 0) {
         /* update BlockOutputStream, flush previous cached data
@@ -53,6 +58,8 @@ void OutputStream::write(const char *buffer, int64_t length, bool isSeek) {
             needUpdate = false;
         }
 
+        LOG(INFO, "[2. qihouliang. OutputStream::write]     |"
+                "Write to local space, mPos=%d",mPos);
         /* write to target block */
         int64_t written;
         if (bytesToWrite <= mBlockOutputStream->remaining()) {
@@ -82,6 +89,8 @@ void OutputStream::write(const char *buffer, int64_t length, bool isSeek) {
         bytesToWrite -= written;
         bytesWritten += written;
         mPos += written;
+        LOG(INFO, "[qihouliang. OutputStream::write]     |"
+                "Write to local space, mPos=%d, written=%d",mPos,written);
         mStatus->setPosition(mPos);
     }
 }
