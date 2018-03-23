@@ -7,9 +7,11 @@ ip_address = "192.168.10.200"
 # Basic Vagrant config (API version 2)
 Vagrant.configure(2) do |config|
 
+
   # Base box: Centos-7 box
   # NOTE: Over time the VMI below may become outdated, so may need to be
   #       substituted with a more recent VMI
+#config.vm.box = "centos71"
   config.vm.box = "bento/centos-7.2"
 # config.vm.box = "box-cutter/centos72"
 
@@ -23,8 +25,8 @@ Vagrant.configure(2) do |config|
   # Give a reasonable amount of cpu and memory to the VM
   config.vm.provider "virtualbox" do |vb|
     vb.name = "libgopherwood-dev-host" # Name in VirtualBox
-    vb.memory = 8192
-    vb.cpus = 4
+    vb.memory = 32768
+    vb.cpus = 12
     vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", "1000"]
     vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-start"]
     vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-on-restore", "1"]
@@ -39,6 +41,9 @@ Vagrant.configure(2) do |config|
       config.vm.synced_folder folder['local'], folder['shared'] unless folder['local'].nil? or folder['shared'].nil?
     end
   end
+
+# config.ssh.username = "vagrant"
+#  config.ssh.password = "vagrant"
 
   # config ssh
   config.vm.provision "ssh", type: "shell", path: "vagrant-ssh.sh"

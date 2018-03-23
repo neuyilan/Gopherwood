@@ -4,10 +4,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "client/gopherwood.h"
+#include "gopherwood.h"
 
 static gopherwoodFS fs;
-char workDir[] = "/tmp/gopherwood";
+char workDir[] = "/ssdfile/goworkspace";
 
 
 void testReadWrite(){
@@ -87,7 +87,7 @@ void testWriteExceedQuota(){
 
 int main(int argc, char *argv[])
 {
-    gwFormatContext(workDir);
+//    gwFormatContext(workDir);
 
     GWContextConfig config;
     config.blockSize = 10;
@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
     fs =  gwCreateContext(workDir, &config);
 
     testReadWrite();
-    testSeekExceedEof();
-    testWriteExceedQuota();
+//    testSeekExceedEof();
+//    testWriteExceedQuota();
 
     gwDestroyContext(fs);
 
