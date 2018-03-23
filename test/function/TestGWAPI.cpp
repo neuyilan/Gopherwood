@@ -21,8 +21,6 @@ void testGWWrite(std::string fileName) {
 
     int SIZE = 128;
 
-
-
     //3. construct the file name
     std::stringstream ss;
     ss << "/ssdfile/ssdkv/" << fileName;
@@ -73,7 +71,7 @@ void testGWRead(string fileName) {
 
     //3. construct the file name
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/test/" << fileName << "-readCache";
+    ss << "/ssdfile/ssdkv/" << fileName << "-readCache";
     std::string fileNameForWrite = ss.str();
 
 

@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include "oss/oss.h"
-#include "oss/buffer.h"
+//#include "oss/buffer.h"
 
 namespace Gopherwood {
     namespace Internal {

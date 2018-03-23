@@ -36,8 +36,8 @@
 #include <cassert>
 #include <errno.h>
 #include <fstream>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
+//#include <libxml/parser.h>
+//#include <libxml/tree.h>
 #include <limits>
 #include <string.h>
 #include <unistd.h>
