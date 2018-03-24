@@ -27,6 +27,7 @@ namespace Internal {
 std::string Configuration::LOCAL_SPACE_FILE("GopherwoodLocal");
 std::string Configuration::SHARED_MEMORY_NAME("GopherwoodSharedMem");
 std::string Configuration::MANIFEST_FOLDER("/manifest");
+std::string Configuration::DEFAULT_LOG_FILE_PATH("/ssdfile/gopherwood.log");
 
 int32_t Configuration::NUMBER_OF_BLOCKS = 100;
 
