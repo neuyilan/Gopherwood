@@ -113,6 +113,10 @@ FileId File::getFileId() {
     return id;
 }
 
+int64_t File::getFileLength(){
+    return mStatus->getEof();
+}
+
 File::~File() {
 }
 

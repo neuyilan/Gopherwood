@@ -53,6 +53,8 @@ public:
 
     void DeleteFile(const char *fileName);
 
+    bool checkFileExists(const char *fileName);
+
     ~FileSystem();
 
 private:

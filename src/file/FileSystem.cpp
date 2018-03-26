@@ -155,6 +155,14 @@ void FileSystem::DeleteFile(const char *fileName) {
     status.reset();
 }
 
+bool FileSystem::checkFileExists(const char *fileName){
+    FileId fileId;
+    shared_ptr<ActiveStatus> status;
+
+    fileId = makeFileId(std::string(fileName));
+    return  mActiveStatusContext->checkFileExists(fileId);
+}
+
 FileSystem::~FileSystem() {
 
 }
