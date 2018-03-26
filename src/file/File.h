@@ -53,6 +53,8 @@ public:
 
     FileId getFileId();
 
+    int64_t getFileLength();
+
     ~File();
 
 private:
