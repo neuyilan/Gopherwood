@@ -117,6 +117,3 @@ TEST_F(TestActiveStatus, TestMutilWrite) {
     free(buffer);
 }
 
-
-}
-
