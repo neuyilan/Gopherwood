@@ -61,7 +61,8 @@ int64_t BlockOutputStream::write(const char *buffer, int64_t length) {
         /* Write to OSS */
     }
 
-    mCached = true;
+    /*added by qihouliang, do not cache */
+//    mCached = true;
 
     mBlockInfo.offset += written;
     assert(mBlockInfo.offset <= mBucketSize);
@@ -70,9 +71,11 @@ int64_t BlockOutputStream::write(const char *buffer, int64_t length) {
 }
 
 void BlockOutputStream::flush() {
-    if (!mCached){
-        return;
-    }
+    /*added by qihouliang, if cache. should return, not !cached*/
+//    if (!mCached){
+//    if (mCached){
+//        return;
+//    }
 
     if (mBlockInfo.isLocal) {
         mLocalWriter->flush();

@@ -38,6 +38,8 @@ int Configuration::CUR_CONNECTION = 10;
 
 uint32_t Configuration::PRE_ALLOCATE_BUCKET_NUM = 3;
 
+std::string Configuration::DEFAULT_LOG_FILE_PATH("/media/ephemeral0/gopherwood.log");
+
 uint32_t Configuration::getCurQuotaSize(){
     return Configuration::NUMBER_OF_BLOCKS/Configuration::CUR_CONNECTION;
 }
