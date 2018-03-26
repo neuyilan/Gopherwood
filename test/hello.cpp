@@ -87,7 +87,7 @@ void testWriteExceedQuota(){
 
 int main(int argc, char *argv[])
 {
-    gwFormatContext(workDir);
+//    gwFormatContext(workDir);
 
     GWContextConfig config;
     config.blockSize = 10;
