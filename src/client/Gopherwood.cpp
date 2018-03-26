@@ -147,7 +147,7 @@ gopherwoodFS gwCreateContext(char *workDir, GWContextConfig *config) {
     if (config != NULL) {
         Configuration::NUMBER_OF_BLOCKS = config->numBlocks;
         Configuration::LOCAL_BUCKET_SIZE = config->blockSize;
-        Configuration::CUR_CONNECTION = config->numPreDefinedConcurrency;
+//        Configuration::CUR_CONNECTION = config->numPreDefinedConcurrency;
     }
 
     try {
@@ -288,6 +288,22 @@ int gwDestroyContext(gopherwoodFS fs) {
 
     return -1;
 }
+
+GWFileInfo *gwStatFile(gopherwoodFS fs, gwFile file){
+    GWFileInfo* gwFileInfo = new GWFileInfo();
+    int64_t retLength = file->getFile().getFileLength();
+    gwFileInfo->fileLength = retLength;
+    LOG(
+            Gopherwood::Internal::INFO,
+            "File size =  %d, gwFileInfo->fileLength=%d.",
+            retLength, gwFileInfo->fileLength);
+    return gwFileInfo;
+}
+
+bool gwCheckFileExist(gopherwoodFS fs, const char *fileName){
+    return fs->getFilesystem().checkFileExists(fileName);
+}
+
 
 #ifdef __cplusplus
 }
