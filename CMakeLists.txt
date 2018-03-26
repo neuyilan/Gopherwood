@@ -110,12 +110,10 @@ set(SOURCE_FILES
         src/block/BlockOutputStream.h
         src/block/LocalBlockWriter.h
         src/block/LocalBlockWriter.cpp
-        src/block/OssBlockWriter.h
-        src/block/OssBlockWriter.cpp
         src/block/LocalBlockReader.h
         src/block/LocalBlockReader.cpp
-        src/block/OssBlockReader.h
-        src/block/OssBlockReader.cpp
+        src/block/OssBlockWorker.h
+        src/block/OssBlockWorker.cpp
         test/hello.cpp
         src/core/BlockStatus.h
         src/core/Manifest.h
