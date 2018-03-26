@@ -376,6 +376,7 @@ void FileSystem::initOssContext() {
               "[FileSystem] OSS context initialization failed!");
     }
 }
+
 bool FileSystem::checkFileExists(const char *fileName){
     FileId fileId;
     shared_ptr<ActiveStatus> status;
