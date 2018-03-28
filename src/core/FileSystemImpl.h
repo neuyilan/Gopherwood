@@ -106,6 +106,8 @@ namespace Gopherwood {
 
             bool checkFileExist(char *fileName);
 
+            bool checkFileExistInSSD(char *fileName);
+
             void createFile(char *fileName);
 
             void acquireNewBlock(char *fileName);

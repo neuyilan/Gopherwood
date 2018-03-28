@@ -146,9 +146,7 @@ tOffset gwSeek(gopherwoodFS fs, gwFile file, tOffset desiredPos, int where);
 int gwCloseFile(gopherwoodFS fs, gwFile file);
 
 
-int deleteFile(gopherwoodFS fs, gwFile file);
-//TODO
-int gwDeleteFile(char *filePath);
+int gwDeleteFile(gopherwoodFS fs, gwFile file);
 
 
 //TODO
@@ -157,6 +155,7 @@ int gwCancelFile(gopherwoodFS fs, gwFile file);
 
 GWFileInfo *gwStatFile(gopherwoodFS fs, gwFile file);
 
+bool gwCheckFileExist(gopherwoodFS fs, char * filename);
 
 #ifdef __cplusplus
 

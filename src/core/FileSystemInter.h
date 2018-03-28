@@ -84,6 +84,7 @@ namespace Gopherwood {
             virtual void catchUpFileStatusFromLog(char *fileName)=0;
 
             virtual bool checkFileExist(char *fileName)=0;
+            virtual bool checkFileExistInSSD(char *fileName)=0;
 
             virtual void createFile(char *fileName)=0;
 

@@ -375,7 +375,7 @@ int gwCloseFile(gopherwoodFS fs, gwFile file) {
     return -1;
 }
 
-int deleteFile(gopherwoodFS fs, gwFile file) {
+int gwDeleteFile(gopherwoodFS fs, gwFile file) {
     try {
         if (file) {
             if (file->isInput()) {
@@ -411,11 +411,11 @@ int deleteFile(gopherwoodFS fs, gwFile file) {
     return -1;
 }
 
-
-//TODO
-int gwDeleteFile(char *filePath) {
-    return 0;
+bool gwCheckFileExist(gopherwoodFS fs, char * filename){
+    return  fs->getFilesystem().checkFileExist(filename);
 }
+
+
 
 //TODO. this may be rethinking, why and how cancel the operation?
 int gwCancelFile(gopherwoodFS fs, gwFile file) {

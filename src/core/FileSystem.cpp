@@ -40,5 +40,9 @@ namespace Gopherwood {
         return res;
     }
 
+    bool FileSystem::checkFileExist(char *filename){
+        return impl->filesystem->checkFileExistInSSD(filename);
+    }
+
 
 }

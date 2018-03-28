@@ -67,6 +67,8 @@ namespace Gopherwood {
 
         int destroyFileSystem();
 
+        bool checkFileExist(char *filename);
+
 //TODO , THIS IS private, for test convenient, set it to public
     public:
 //        Config conf;

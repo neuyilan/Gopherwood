@@ -395,6 +395,15 @@ namespace Gopherwood {
             return false;
         }
 
+        bool FileSystemImpl::checkFileExistInSSD(char *fileName) {
+            char *filePathName = getFilePath(fileName);
+            if(access(filePathName,F_OK)==-1){
+                return false;
+            }
+            return true;
+        }
+
+
         //TODO, needs some test
         void FileSystemImpl::createFile(char *fileName) {
             auto &status = fileStatusMap[fileName];
