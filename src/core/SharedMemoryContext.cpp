@@ -346,9 +346,11 @@ void SharedMemoryContext::releaseBuckets(std::list<Block> &blocks) {
 int SharedMemoryContext::activateBucket(FileId fileId, Block &block, int activeId, bool isWrite) {
     int rc = -1;
     int32_t bucketId = block.bucketId;
-
+    LOG(INFO,"qihouliang. buckets[bucketId].fileBlockIndex=%d, block.blockId=%d, block.bucketId=%d",buckets[bucketId].fileBlockIndex,
+        block.blockId, block.bucketId);
     if (buckets[bucketId].fileId != fileId ||
         buckets[bucketId].fileBlockIndex != block.blockId) {
+
         THROW(GopherwoodSharedMemException,
               "[SharedMemoryContext::activateBlock] File Id mismatch, expect fileId = %lu-%u, "
                       "current bucket fileId=%lu-%u",

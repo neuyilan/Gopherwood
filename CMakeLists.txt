@@ -120,6 +120,8 @@ set(SOURCE_FILES
         src/core/Manifest.cpp
         src/core/BlockStatus.cpp
         src/core/BlockStatus.cpp
+        src/core/SharedMemoryObj.h
+        src/core/SharedMemoryObj.cpp
         src/block/BlockInputStream.h
         src/block/BlockInputStream.cpp)
 

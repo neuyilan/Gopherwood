@@ -30,7 +30,7 @@ namespace Gopherwood {
 namespace Internal {
 
 ossContext FileSystem::OSS_CONTEXT = NULL;
-std::string FileSystem::OSS_BUCKET = "";
+std::string FileSystem::OSS_BUCKET = "oss";
 
 void FileSystem::Format(const char *workDir) {
     std::stringstream ss;
@@ -50,6 +50,7 @@ FileSystem::FileSystem(const char *workDir) :
     int flags = O_CREAT | O_RDWR;
     mLocalSpaceFile = open(filePath.c_str(), flags, 0644);
 
+    LOG(INFO,"qihouliang.mLocalSpaceFile=%d ",mLocalSpaceFile);
     /* create lock file */
     ss.str("");
     ss << workDir << "/SmLock";

@@ -31,7 +31,7 @@
 namespace Gopherwood {
 namespace Internal {
 
-int64_t Manifest::BUFFER_SIZE = 4 * 1024;
+int64_t Manifest::BUFFER_SIZE = 4 * 1024*1024;
 
 Manifest::Manifest(std::string path) :
         mFilePath(path), mFD(-1) {
@@ -187,6 +187,7 @@ RecordHeader Manifest::fetchOneLogRecord(std::vector<Block> &blocks) {
 
     /* get log size and eyecatcher */
     bytesRead = mfRead(mBuffer, 10);
+    LOG(INFO,"qihouliang. bytesRead=%d",bytesRead);
     if (bytesRead == 0) {
         header.type = RecordType::invalidLog;
         return header;
@@ -196,7 +197,7 @@ RecordHeader Manifest::fetchOneLogRecord(std::vector<Block> &blocks) {
     uint16_t eyecatcher = *(uint16_t *) (mBuffer + 8);
     if (recLength > BUFFER_SIZE) {
         THROW(GopherwoodException,
-              "[Manifest::fetchOneLogRecord] recLength should not exceed buffer size.");
+              "[Manifest::fetchOneLogRecord] recLength should not exceed buffer size. recLength=%d, BUFFER_SIZE=%d", recLength,BUFFER_SIZE);
     }
     if (bytesRead == -1 ||
         bytesRead != 10 ||
@@ -217,6 +218,10 @@ RecordHeader Manifest::fetchOneLogRecord(std::vector<Block> &blocks) {
     BlockRecord *blockRecord = (BlockRecord *) (mBuffer + sizeof(RecordHeader));
     while (numBlocks < header.numBlocks) {
         Block block = blockRecord->toBlockFormat();
+
+        LOG(INFO,"qihouliang. block.state=%d, block.blockId=%d, block.bucketId=%d, block.isLocal=%d",
+            block.state, block.blockId, block.bucketId, block.isLocal);
+
         blocks.push_back(block);
         blockRecord++;
         numBlocks++;
@@ -284,9 +289,12 @@ void Manifest::mfOpen() {
 
 void Manifest::mfSeek(int64_t offset, int flag) {
     mPos = lseek(mFD, offset, flag);
+    mReadPos = lseek(mFD, offset, flag);
 }
 
 void Manifest::mfWrite(std::string &record) {
+    mPos = lseek(mFD,0,SEEK_END);
+    LOG(INFO,"qihouliang, mfWrite before mPos=%d",mPos);
     int len = write(mFD, record.c_str(), record.size());
     if (len == -1 || len != (int) record.size()) {
         THROW(GopherwoodIOException,
@@ -294,10 +302,16 @@ void Manifest::mfWrite(std::string &record) {
               mFilePath.c_str());
     }
     mPos += len;
+    LOG(INFO,"qihouliang, mfWrite after mPos=%d",mPos);
 }
 
 inline int64_t Manifest::mfRead(char *buffer, int64_t size) {
-    return read(mFD, buffer, size);
+    LOG(INFO,"qihouliang. Manifest::mfRead. before mReadPos=%d",mReadPos);
+    lseek(mFD,mReadPos,SEEK_SET);
+    int64_t len = read(mFD, buffer, size);
+    mReadPos+=len;
+    LOG(INFO,"qihouliang. Manifest::mfRead. after mReadPos=%d",mReadPos);
+    return len;
 }
 
 void Manifest::mfTruncate() {

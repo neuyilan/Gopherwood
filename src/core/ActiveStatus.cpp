@@ -211,7 +211,7 @@ void ActiveStatus::acquireNewBlocks() {
                 numToAcquire = numAvailable > tmpAcquire ? tmpAcquire : numAvailable;
                 /* it might exceed quota after acquired new buckets */
                 numToInactivate = (mLRUCache->size() + numToAcquire) > quota ?
-                                   mLRUCache->size() + numToAcquire - quota : 0;
+                                  mLRUCache->size() + numToAcquire - quota : 0;
             } else {
                 /* 2(b) play with current owned buckets
                  * evict one block at a time. This will make sure the inactivated block is
@@ -329,8 +329,9 @@ void ActiveStatus::acquireNewBlocks() {
                     numToAcquire--;
                 }
 
+                LOG(INFO, "qihouliang. rc=%d", rc);
                 /* add log to the evicted file */
-                if (rc == 1) {
+                if (rc == 0 || rc == 1) {
                     logEvictBlock(evictBlockInfo);
                 }
 
@@ -396,7 +397,22 @@ void ActiveStatus::extendOneBlock() {
     mBlockArray.push_back(b);
 
     /* add to LRU cache */
-    mLRUCache->put(b.blockId, b.bucketId);
+    //TODO qihouliang
+    /**********************added by qihouliang********************/
+    std::vector<int> blockIds = mLRUCache->put(b.blockId, b.bucketId);
+    std::vector<Block> blocksToInactivate;
+    for( int blockID: blockIds){
+        blocksToInactivate.push_back(mBlockArray[blockID]);
+    }
+    std::vector<Block> turedToUsedBlocks = mSharedMemoryContext->inactivateBuckets(blocksToInactivate,mFileId,mActiveId,mIsWrite);
+    /* update block status*/
+    for (Block b : turedToUsedBlocks) {
+        mBlockArray[b.blockId].state = b.state;
+    }
+    /* log inactivate buckets */
+    mManifest->logInactivateBucket(turedToUsedBlocks);
+    /**********************added by qihouliang********************/
+
 
     /* prepare for log */
     blocksModified.push_back(b);
@@ -409,6 +425,8 @@ void ActiveStatus::extendOneBlock() {
         opaque.extendBlock.eof = mEof;
         mManifest->logExtendBlock(blocksModified, opaque);
     SHARED_MEM_END
+
+
     LOG(INFO, "[ActiveStatus]          |"
             "ExtendOneBlock blockId=%d, bucketId=%d",
         b.blockId, b.bucketId);
@@ -427,6 +445,7 @@ void ActiveStatus::activateBlock(int blockId) {
         acquireNewBlocks();
     }
 
+    LOG(INFO, "qihouliang. blockId = %d, mBlockArray[blockId].isLocal=%d,", blockId, mBlockArray[blockId].isLocal);
     /* Main logic to activate the block */
     SHARED_MEM_BEGIN
         /* after catched up the log, we can handle cases in a consistent state */
@@ -442,7 +461,24 @@ void ActiveStatus::activateBlock(int blockId) {
             block.state = BUCKET_ACTIVE;
 
             /* add to LRU cache */
-            mLRUCache->put(block.blockId, block.bucketId);
+//            mLRUCache->put(block.blockId, block.bucketId);
+
+            //TODO qihouliang
+            /**********************added by qihouliang********************/
+            std::vector<int> blockIds = mLRUCache->put(block.blockId, block.bucketId);
+            std::vector<Block> blocksToInactivate;
+            for( int blockID: blockIds){
+                blocksToInactivate.push_back(mBlockArray[blockID]);
+            }
+            std::vector<Block> turedToUsedBlocks = mSharedMemoryContext->inactivateBuckets(blocksToInactivate,mFileId,mActiveId,mIsWrite);
+            /* update block status*/
+            for (Block b : turedToUsedBlocks) {
+                mBlockArray[b.blockId].state = b.state;
+            }
+            /* log inactivate buckets */
+            mManifest->logInactivateBucket(turedToUsedBlocks);
+            /**********************added by qihouliang********************/
+
             /* update block info */
             mBlockArray[blockId] = block;
             /* mark loading log */
@@ -484,7 +520,25 @@ void ActiveStatus::activateBlock(int blockId) {
                 THROW(GopherwoodException, "[ActiveStatus] activateBucket in SharedMemory got error!");
             }
 
-            mLRUCache->put(mBlockArray[blockId].blockId, mBlockArray[blockId].bucketId);
+//            mLRUCache->put(mBlockArray[blockId].blockId, mBlockArray[blockId].bucketId);
+
+            //TODO qihouliang
+            /**********************added by qihouliang********************/
+            std::vector<int> blockIds =  mLRUCache->put(mBlockArray[blockId].blockId, mBlockArray[blockId].bucketId);
+            std::vector<Block> blocksToInactivate;
+            for( int blockID: blockIds){
+                blocksToInactivate.push_back(mBlockArray[blockID]);
+            }
+            std::vector<Block> turedToUsedBlocks = mSharedMemoryContext->inactivateBuckets(blocksToInactivate,mFileId,mActiveId,mIsWrite);
+            /* update block status*/
+            for (Block b : turedToUsedBlocks) {
+                mBlockArray[b.blockId].state = b.state;
+            }
+            /* log inactivate buckets */
+            mManifest->logInactivateBucket(turedToUsedBlocks);
+            /**********************added by qihouliang********************/
+
+
         } else {
             THROW(GopherwoodException, "[ActiveStatus] block active status mismatch!");
         }
@@ -530,6 +584,7 @@ void ActiveStatus::logEvictBlock(BlockInfo info) {
               "[ActiveStatus::ActiveStatus] File does not exist %s",
               manifestFileName.c_str());
     }
+
     Manifest *manifest = new Manifest(manifestFileName);
     manifest->mfSeek(0, SEEK_END);
     Block block(InvalidBucketId, info.blockId, false, BUCKET_FREE);
@@ -578,6 +633,7 @@ void ActiveStatus::close() {
             mBlockArray[b.blockId].state = b.state;
         }
 
+
         if (turedToUsedBlocks.size() > 0) {
             /* log inactivate buckets */
             mManifest->logInactivateBucket(turedToUsedBlocks);
@@ -585,6 +641,16 @@ void ActiveStatus::close() {
 
         /* this will set the shouldDestroy field */
         unregistInSharedMem();
+
+
+        /**********************added by qihouliang********************/
+//        for (Block block : mBlockArray) {
+//            if (block.isLocal && block.state == BUCKET_ACTIVE) {
+//                mBlockArray[block.blockId].state = BUCKET_USED;
+//            }
+//        }
+        /**********************added by qihouliang********************/
+
 
         if (!mSharedMemoryContext->isFileOpening(mFileId)) {
             if (mShouldDestroy) {
@@ -637,7 +703,7 @@ void ActiveStatus::close() {
 
                 mOssWorker->deleteBlock(info);
             }
-            THROW(GopherwoodNotImplException, "Not implemented yet!");
+//            THROW(GopherwoodNotImplException, "Not implemented yet!");
         }
     }
 }
@@ -645,8 +711,11 @@ void ActiveStatus::close() {
 void ActiveStatus::catchUpManifestLogs() {
     std::vector<Block> blocks;
 
+    LOG(INFO, "come in the catchUpManifestLogs");
     while (true) {
         RecordHeader header = mManifest->fetchOneLogRecord(blocks);
+
+        LOG(INFO, "qihouliang. header.type=%d", header.type);
         if (header.type == RecordType::invalidLog) {
             break;
         }
@@ -689,9 +758,10 @@ void ActiveStatus::catchUpManifestLogs() {
             case RecordType::extendBlock:
                 LOG(INFO, "[ActiveStatus]          |"
                         "Replay assignBlock log record with %lu blocks.", blocks.size());
-                assert(header.numBlocks == 1);
-                mBlockArray.push_back(blocks[0]);
-                mEof = header.opaque.extendBlock.eof;
+                LOG(WARNING, "by qihouliang, do nothing, because have been added in the activeStatus class");
+//                assert(header.numBlocks == 1);
+//                mBlockArray.push_back(blocks[0]);
+//                mEof = header.opaque.extendBlock.eof;
                 break;
             case RecordType::evictBlock:
                 LOG(INFO, "[ActiveStatus]          |"
@@ -699,6 +769,9 @@ void ActiveStatus::catchUpManifestLogs() {
                 assert(header.numBlocks == 1);
                 if (mBlockArray[blocks[0].blockId].isLocal && mBlockArray[blocks[0].blockId].state == BUCKET_USED) {
                     mBlockArray[blocks[0].blockId] = blocks[0];
+
+                    LOG(INFO, "qihouliang. blocks[0].isLocal=%d", blocks[0].isLocal);
+
                 } else {
                     THROW(GopherwoodException,
                           "[ActiveStatus] The block %d status is not BUCKET_USED when replaying the evictBlock log ",
@@ -709,7 +782,8 @@ void ActiveStatus::catchUpManifestLogs() {
                 LOG(INFO, "[ActiveStatus]          |"
                         "Replay loadBlock log record with %lu blocks.", blocks.size());
                 assert(header.numBlocks == 1);
-                if (!mBlockArray[blocks[0].blockId].isLocal) {
+                //TODO.
+                if (mBlockArray[blocks[0].blockId].isLocal) {
                     mBlockArray[blocks[0].blockId] = blocks[0];
                 } else {
                     THROW(GopherwoodException,
@@ -722,6 +796,7 @@ void ActiveStatus::catchUpManifestLogs() {
                         "Replay fullStatus log record with %lu blocks. EOF=%lu", blocks.size(),
                     header.opaque.fullStatus.eof);
                 for (Block block : blocks) {
+                    LOG(INFO, "qihouliang. block.isLocal=%d", block.isLocal);
                     mBlockArray.push_back(block);
                 }
                 mEof = header.opaque.fullStatus.eof;
@@ -737,6 +812,15 @@ void ActiveStatus::catchUpManifestLogs() {
                       "[ActiveStatus] Log type %d not implemented when catching up logs.",
                       header.type);
         }
+
+        LOG(INFO, "qihouliang ************************************* qihouliang");
+        for (int i = 0; i < mBlockArray.size(); i++) {
+            LOG(INFO,
+                "mBlockArray[i].isLocal=%d, mBlockArray[i].bucketId=%d, mBlockArray[i].blockId=%d,mBlockArray[i].state=%d",
+                mBlockArray[i].isLocal, mBlockArray[i].bucketId, mBlockArray[i].blockId, mBlockArray[i].state);
+        }
+
+        LOG(INFO, "qihouliang ************************************* qihouliang");
         blocks.clear();
     }
 }

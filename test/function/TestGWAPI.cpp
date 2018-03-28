@@ -22,7 +22,7 @@ GWContextConfig config;
 
 void initConfig() {
     config.blockSize = 4 * 1 * 1024;;
-    config.numBlocks = 100;
+    config.numBlocks = 10;
     config.numPreDefinedConcurrency = 10;
 }
 
@@ -44,7 +44,7 @@ void testGWWrite(std::string fileName) {
 
     /*3. construct the  input source file name*/
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/" << fileName;
+    ss << "/ssdfile/goworkspace/" << fileName;
     std::string filePath = ss.str();
 
     /*4. read data from file*/
@@ -91,7 +91,7 @@ void testGWRead(string fileName) {
 
     //3. construct the file name
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/" << fileName << "-readCache";
+    ss << "/ssdfile/goworkspace/" << fileName << "-readCache";
     std::string fileNameForWrite = ss.str();
 
 
@@ -118,13 +118,14 @@ void testGWRead(string fileName) {
 }
 
 
-//void testGWDelete(string fileName) {
-//    gopherwoodFS gwFS = gwCreateContext((char *) fileName.c_str());
-//    gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), O_RDONLY);
-//    std::cout << "***********START OF DELETE**************" << std::endl;
-//    deleteFile(gwFS, file);
-//    std::cout << "***********END OF  DELETE**************" << std::endl;
-//}
+void testGWDelete(string fileName) {
+    /*2. create the context and open the file*/
+    initConfig();
+    gopherwoodFS gwFS = gwCreateContext(workDir, &config);
+    std::cout << "***********START OF DELETE**************" << std::endl;
+    gwDeleteFile(gwFS, (char *) fileName.c_str());
+    std::cout << "***********END OF  DELETE**************" << std::endl;
+}
 
 
 int main(int agrInt, char **agrStr) {
@@ -161,14 +162,13 @@ int main(int agrInt, char **agrStr) {
         testGWRead(fileNameArr[1]);
     } else if (strcmp(agrStr[1], "read-3") == 0) {
         testGWRead(fileNameArr[2]);
+    } else if (strcmp(agrStr[1], "delete-1") == 0) {
+        testGWDelete(fileNameArr[0]);
+    } else if (strcmp(agrStr[1], "delete-2") == 0) {
+        testGWDelete(fileNameArr[1]);
+    } else if (strcmp(agrStr[1], "delete-3") == 0) {
+        testGWDelete(fileNameArr[2]);
     }
-//    else if (strcmp(agrStr[1], "delete-1") == 0) {
-//        testGWDelete(fileNameArr[0]);
-//    } else if (strcmp(agrStr[1], "delete-2") == 0) {
-//        testGWDelete(fileNameArr[1]);
-//    } else if (strcmp(agrStr[1], "delete-3") == 0) {
-//        testGWDelete(fileNameArr[2]);
-//    }
 
 
 }

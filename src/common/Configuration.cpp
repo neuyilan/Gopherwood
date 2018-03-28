@@ -29,7 +29,7 @@ std::string Configuration::SHARED_MEMORY_NAME("GopherwoodSharedMem");
 std::string Configuration::MANIFEST_FOLDER("/manifest");
 std::string Configuration::DEFAULT_LOG_FILE_PATH("/ssdfile/gopherwood.log");
 
-int32_t Configuration::NUMBER_OF_BLOCKS = 100;
+int32_t Configuration::NUMBER_OF_BLOCKS = 3000;
 
 int64_t Configuration::LOCAL_BUCKET_SIZE = 64 * 1024 * 1024;
 
