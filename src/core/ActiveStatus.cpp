@@ -555,6 +555,16 @@ void ActiveStatus::activateBlock(int blockId) {
 
         mOssWorker->readBlock(info);
 
+        //TODO qihouliang
+        /**********************added by qihouliang********************/
+        BlockInfo deleteBlockinfo;
+        deleteBlockinfo.bucketId = -1;
+        deleteBlockinfo.blockId = blockId;
+        deleteBlockinfo.fileId = mFileId;
+        deleteBlockinfo.isLocal = false;
+        mOssWorker->deleteBlock(deleteBlockinfo);
+        /**********************added by qihouliang********************/
+
         SHARED_MEM_BEGIN
             mSharedMemoryContext->markLoadFinish(mBlockArray[blockId], mActiveId, mFileId);
         SHARED_MEM_END
