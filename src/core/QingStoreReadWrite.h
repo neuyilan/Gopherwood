@@ -58,7 +58,7 @@ namespace Gopherwood {
             const char *access_key_id = "CNQHLNCMKNSMQXMMTGVL";
             const char *secret_access_key = "RV9HRXHLpcBQe5cSqwZN7i2OBYpmvEO1wXpRugx7";
             const char *location = "pek3a";
-            const char *bucket_name = "gopherwood-qhl";
+            const char *bucket_name = "gopherwood-prototype-tapesort";
 
 
 //            char qs_ak[100] = {"CNQHLNCMKNSMQXMMTGVL"};
@@ -68,7 +68,7 @@ namespace Gopherwood {
             int64_t read_buffer_size = 32 << 20;
 
 
-            context qsContext;
+            ossContext qsContext;
             ossObject putObject;
             ossObject getObject;
 

@@ -148,7 +148,6 @@ set(SOURCE_FILES
         test/function/TestReadWriteSeek.cpp
         test/function/TestRandomReadWriteSeek.cpp
         test/function/TestGWAPI.cpp
-        test/function/gopherwood.h
         test/CMakeLists.txt
         vagrant/id_rsa
         vagrant/id_rsa.pub

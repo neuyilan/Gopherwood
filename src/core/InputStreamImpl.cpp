@@ -140,8 +140,9 @@ namespace Gopherwood {
                     while (bufLength > 0) {
                         if (bufLength > SIZE_OF_BLOCK) {
 
-                            filesystem->getLock();
                             seekToNextBlock();
+
+                            filesystem->getLock();
                             readLength = filesystem->readDataFromBucket(buf + totalOffset, SIZE_OF_BLOCK);
                             filesystem->releaseLock();
 
@@ -151,8 +152,9 @@ namespace Gopherwood {
                             cursorOffset += readLength;
                         } else {
 
-                            filesystem->getLock();
                             seekToNextBlock();
+
+                            filesystem->getLock();
                             readLength = filesystem->readDataFromBucket(buf + totalOffset, bufLength);
                             filesystem->releaseLock();
 
@@ -260,6 +262,7 @@ namespace Gopherwood {
         //TODO,
         void InputStreamImpl::close() {
             filesystem->closeFile((char *) fileName.data());
+            LOG(INFO,"InputStreamImpl::close. have come in the InputStreamImpl close method");
         }
 
 
@@ -268,14 +271,14 @@ namespace Gopherwood {
         }
 
         int64_t InputStreamImpl::checkStatus(int64_t pos) {
-            LOG(INFO, "InputStreamImpl::checkStatus pos = %d", pos);
+            LOG(INFO, "InputStreamImpl::checkStatus pos = %ld", pos);
             if (pos < 0) {
                 LOG(LOG_ERROR, "InputStreamImpl::checkStatus pos can not be smaller than zero");
                 return -1;
             }
             //1. check the size of the file
             int64_t theEOFOffset = this->filesystem->getTheEOFOffset(this->fileName.data());
-            LOG(INFO, "InputStreamImpl::checkStatus. theEOFOffset=%d", theEOFOffset);
+            LOG(INFO, "InputStreamImpl::checkStatus. theEOFOffset=%ld", theEOFOffset);
 
             if (theEOFOffset == 0) {
                 LOG(INFO, "InputStreamImpl::checkStatus. the file do not contain any one bucket");

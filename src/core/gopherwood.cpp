@@ -213,6 +213,7 @@ private:
 
 
 gopherwoodFS gwCreateContext() {
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwCreateContext]");
     gopherwoodFS retVal = NULL;
 
 
@@ -227,16 +228,19 @@ gopherwoodFS gwCreateContext() {
 
 
 int gwDestroyContext(gopherwoodFS fs) {
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwDestroyContext]");
     return fs->getFilesystem().destroyFileSystem();
 }
 
 //TODO
 tSize gwRead(gopherwoodFS fs, gwFile file, void *buffer, tSize length) {
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwRead]");
     return file->getInputStream().read(static_cast<char *>(buffer), length);
 }
 
 
 gwFile gwOpenFile(gopherwoodFS fs, const char *fileName, int flags) {
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwOpenFile]");
     GWFileInternalWrapper *file = NULL;
     OutputStream *os = NULL;
     InputStream *is = NULL;
@@ -302,6 +306,7 @@ gwFile gwOpenFile(gopherwoodFS fs, const char *fileName, int flags) {
 
 
 int64_t gwSeek(gopherwoodFS fs, gwFile file, tOffset desiredPos, int where) {
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwSeek]");
     int64_t retOffset = 0;
     try {
         if (file->isInput()) {
@@ -328,7 +333,7 @@ int64_t gwSeek(gopherwoodFS fs, gwFile file, tOffset desiredPos, int where) {
 int32_t gwWrite(gopherwoodFS fs, gwFile file, const void *buffer, tSize length) {
 //    PARAMETER_ASSERT(fs && file && buffer && length > 0, -1, EINVAL);
 //    PARAMETER_ASSERT(!file->isInput(), -1, EINVAL);
-
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwWrite]");
     try {
         file->getOutputStream().write(static_cast<const char *>(buffer), length);
         return length;
@@ -345,7 +350,7 @@ int32_t gwWrite(gopherwoodFS fs, gwFile file, const void *buffer, tSize length) 
 
 
 int gwCloseFile(gopherwoodFS fs, gwFile file) {
-
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwCloseFile]");
     try {
         if (file) {
             if (file->isInput()) {
@@ -359,7 +364,7 @@ int gwCloseFile(gopherwoodFS fs, gwFile file) {
                 //BUG-FIX. just one close is enough, because they share the same FileSystem object
                 file->getOutputStream().close();
             }
-            delete file;
+//            delete file;
         }
 
         return 0;
@@ -376,6 +381,7 @@ int gwCloseFile(gopherwoodFS fs, gwFile file) {
 }
 
 int gwDeleteFile(gopherwoodFS fs, gwFile file) {
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwDeleteFile]");
     try {
         if (file) {
             if (file->isInput()) {
@@ -412,6 +418,7 @@ int gwDeleteFile(gopherwoodFS fs, gwFile file) {
 }
 
 bool gwCheckFileExist(gopherwoodFS fs, char * filename){
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwCheckFileExist]");
     return  fs->getFilesystem().checkFileExist(filename);
 }
 
@@ -430,6 +437,7 @@ static void ConstructGWFileInfo(GWFileInfo *retval, std::shared_ptr<FileStatus> 
 
 //TODO.
 GWFileInfo *gwStatFile(gopherwoodFS fs, gwFile file) {
+    LOG(Gopherwood::Internal::INFO, "[Gopherwood. gwStatFile]");
     GWFileInfo *retval = NULL;
     try {
         if (file->isInput()) {

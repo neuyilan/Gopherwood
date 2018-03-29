@@ -394,21 +394,23 @@ namespace Gopherwood {
 
 
         void SharedMemoryManager::getLock() {
+            LOG(INFO, "SharedMemoryManager::getLock. acquire the lock");
             if (!semaphoreP()) {
                 LOG(LOG_ERROR,
-                    "SharedMemoryManager::evictBlock. can not acquire the semaphore, acquireNewBlock failure");
+                    "SharedMemoryManager::getLock. can not acquire the semaphore, acquireNewBlock failure");
             }
             if (checkAndSetSMOne()) {
-                LOG(LOG_ERROR, "SharedMemoryManager::evictBlock. acquireNewBlock failed, shared memory is broken");
+                LOG(LOG_ERROR, "SharedMemoryManager::getLock. acquireNewBlock failed, shared memory is broken");
             }
 
         }
 
         void SharedMemoryManager::releaseLock() {
+            LOG(INFO, "SharedMemoryManager::releaseLock. release the lock");
             checkAndSetSMZero();
             if (!semaphoreV()) {
                 LOG(LOG_ERROR,
-                    "SharedMemoryManager::evictBlock. can not release the semaphore, acquireNewBlock failure");
+                    "SharedMemoryManager::releaseLock. can not release the semaphore, acquireNewBlock failure");
             }
 
         }

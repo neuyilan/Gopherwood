@@ -291,6 +291,7 @@ namespace Gopherwood {
             //4. set the fileName
             fileStatus->setFileName(fileName);
 
+
             LOG(INFO, "******* rebuildFileStatusFromLog in the end, before the close File Status***********");
             int64_t endOffsetOfBucket = fileStatus->getEndOffsetOfBucket();
             vector<int32_t> blockIDVector = fileStatus->getBlockIdVector();

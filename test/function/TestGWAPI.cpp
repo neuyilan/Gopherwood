@@ -11,7 +11,6 @@
 #include <sstream>
 #include <cstring>
 #include "gopherwood.h"
-//#include "../../src/core/gopherwood.h"
 
 using namespace std;
 
@@ -23,7 +22,7 @@ void testGWWrite(std::string fileName) {
 
     //3. construct the file name
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/" << fileName;
+    ss << "/ssdfile/prototype/" << fileName;
     std::string filePath = ss.str();
 
     //4. read data from file
@@ -71,7 +70,7 @@ void testGWRead(string fileName) {
 
     //3. construct the file name
     std::stringstream ss;
-    ss << "/ssdfile/ssdkv/" << fileName << "-readCache";
+    ss << "/ssdfile/prototype/" << fileName << "-readCache";
     std::string fileNameForWrite = ss.str();
 
 
@@ -99,11 +98,10 @@ void testGWRead(string fileName) {
 
 
 void testGWDelete(string fileName) {
-    AccessFileType type = AccessFileType::randomType;
     gopherwoodFS gwFS = gwCreateContext();
     gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), O_RDONLY);
     std::cout << "***********START OF DELETE**************" << std::endl;
-//    deleteFile(gwFS, file);
+    gwDeleteFile(gwFS, file);
     std::cout << "***********END OF  DELETE**************" << std::endl;
 }
 
@@ -129,7 +127,7 @@ void testGWMultiFileWithOneGWFS() {
     fileNameArr[1] = "TestReadWriteSeek-WriteBlockWithEvictOtherFileBlock";
     fileNameArr[2] = "TestReadWriteSeek-ThirdThread";
 
-    int timeCount = 10;
+    int timeCount = 1000;
 
     AccessFileType type = AccessFileType::randomType;
     gopherwoodFS gwFS = gwCreateContext();

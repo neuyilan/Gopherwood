@@ -1,0 +1,3 @@
+********main*******agrInt= 2, agrStr[1]= delete-1
+***********START OF DELETE**************
+***********END OF  DELETE**************
