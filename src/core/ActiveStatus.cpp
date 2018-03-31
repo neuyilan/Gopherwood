@@ -559,12 +559,16 @@ void ActiveStatus::activateBlock(int blockId) {
 }
 
 void ActiveStatus::logEvictBlock(BlockInfo info) {
+
+    /*added by qihouliang. bug-fix. should check whether the evictBlock is my own file or not, if is my block, this should use
+     * my own manifest file descriptor, if not use my own manifest file descriptor,
+     * the evictlog will be replaced by the next acquireNewBlock log in the acquireNewBlocks() method.
+     * */
     Block block(InvalidBucketId, info.blockId, false, BUCKET_FREE);
     if(mFileId==info.fileId){
         mManifest->logEvcitBlock(block);
         mBlockArray[block.blockId] = block;
-    }else {
-        /* check file exist */
+    }else{
         std::string manifestFileName = Manifest::getManifestFileName(mSharedMemoryContext->getWorkDir(), info.fileId);
         if (access(manifestFileName.c_str(), F_OK) == -1) {
             THROW(GopherwoodInvalidParmException,
@@ -736,6 +740,8 @@ void ActiveStatus::catchUpManifestLogs() {
                 LOG(INFO, "[ActiveStatus]          |"
                         "Replay evictBlock log record with %lu blocks.", blocks.size());
                 assert(header.numBlocks == 1);
+                LOG(LOG_ERROR,"qihouliang.ActiveStatus::catchUpManifestLogs.blocks[0].state=%d, blocks[0].blockId=%d, blocks[0].isLocal=%d,"
+                        " blocks[0].bucketId=%d", blocks[0].state, blocks[0].blockId,blocks[0].isLocal,blocks[0].bucketId);
                 if (mBlockArray[blocks[0].blockId].isLocal && mBlockArray[blocks[0].blockId].state == BUCKET_USED) {
                     mBlockArray[blocks[0].blockId] = blocks[0];
                 } else {
@@ -776,6 +782,14 @@ void ActiveStatus::catchUpManifestLogs() {
                       "[ActiveStatus] Log type %d not implemented when catching up logs.",
                       header.type);
         }
+
+        /*added by qihouliang*/
+        for (int i = 0; i < mBlockArray.size(); i++) {
+            LOG(INFO,
+                "qihouliang. ActiveStatus::catchUpManifestLogs mBlockArray[i].isLocal=%d, mBlockArray[i].bucketId=%d, mBlockArray[i].blockId=%d,mBlockArray[i].state=%d",
+                mBlockArray[i].isLocal, mBlockArray[i].bucketId, mBlockArray[i].blockId, mBlockArray[i].state);
+        }
+
         blocks.clear();
     }
 }
