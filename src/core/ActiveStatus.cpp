@@ -559,7 +559,6 @@ void ActiveStatus::activateBlock(int blockId) {
 }
 
 void ActiveStatus::logEvictBlock(BlockInfo info) {
-
     /*added by qihouliang. bug-fix. should check whether the evictBlock is my own file or not, if is my block, this should use
      * my own manifest file descriptor, if not use my own manifest file descriptor,
      * the evictlog will be replaced by the next acquireNewBlock log in the acquireNewBlocks() method.
