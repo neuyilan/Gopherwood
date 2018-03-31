@@ -349,12 +349,17 @@ int SharedMemoryContext::activateBucket(FileId fileId, Block &block, int activeI
 
     if (buckets[bucketId].fileId != fileId ||
         buckets[bucketId].fileBlockIndex != block.blockId) {
+
+        /*added by qihouliang*/
+        LOG(LOG_ERROR, "qihouliang. SharedMemoryContext::activateBlock. buckets[bucketId].fileBlockIndex=%d, block.blockId=%d", buckets[bucketId].fileBlockIndex,
+            block.blockId);
         THROW(GopherwoodSharedMemException,
               "[SharedMemoryContext::activateBlock] File Id mismatch, expect fileId = %lu-%u, "
                       "current bucket fileId=%lu-%u",
               fileId.hashcode, fileId.collisionId,
               buckets[bucketId].fileId.hashcode, buckets[bucketId].fileId.collisionId
         );
+
     }
 
     if (buckets[bucketId].isUsedBucket()) {
