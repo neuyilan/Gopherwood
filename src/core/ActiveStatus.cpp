@@ -654,7 +654,6 @@ void ActiveStatus::close() {
 
                 mOssWorker->deleteBlock(info);
             }
-            THROW(GopherwoodNotImplException, "Not implemented yet!");
         }
     }
 }
