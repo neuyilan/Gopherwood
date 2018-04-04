@@ -231,7 +231,8 @@ int64_t gwSeek(gopherwoodFS fs, gwFile file, tOffset desiredPos, int mode) {
 }
 
 int32_t gwWrite(gopherwoodFS fs, gwFile file, const void *buffer, tSize length) {
-    LOG(Gopherwood::Internal::INFO, "------------------gwWrite start------------------");
+    LOG(Gopherwood::Internal::INFO, "------------------gwWrite start------------------, "
+            "fileName = %s",file->getFile().getFileId().toString().c_str());
     try {
         file->getFile().write(static_cast<const char *>(buffer), length);
         return length;
