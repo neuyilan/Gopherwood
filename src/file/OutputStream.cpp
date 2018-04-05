@@ -76,6 +76,7 @@ void OutputStream::write(const char *buffer, int64_t length, bool isSeek) {
         }
 
 
+        LOG(LOG_ERROR,"qihouliang-info, OutputStream::write. written=%ld, errno=%d. ",written, errno);
         if (written == -1) {
             THROW(GopherwoodException,
                   "[OutputStream::write] write error!");
