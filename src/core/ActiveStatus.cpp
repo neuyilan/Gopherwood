@@ -542,8 +542,7 @@ void ActiveStatus::logEvictBlock(BlockInfo info) {
     if(mFileId==info.fileId){
         mManifest->logEvcitBlock(block);
         mBlockArray[block.blockId] = block;
-    }else {
-        /* check file exist */
+    }else{
         std::string manifestFileName = Manifest::getManifestFileName(mSharedMemoryContext->getWorkDir(), info.fileId);
         if (access(manifestFileName.c_str(), F_OK) == -1) {
             THROW(GopherwoodInvalidParmException,
