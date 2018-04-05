@@ -31,7 +31,7 @@
 namespace Gopherwood {
 namespace Internal {
 
-int64_t Manifest::BUFFER_SIZE = 4 * 1024;
+int64_t Manifest::BUFFER_SIZE = 4* 1024* 1024;
 
 Manifest::Manifest(std::string path) :
         mFilePath(path), mFD(-1) {

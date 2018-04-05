@@ -39,19 +39,18 @@ void OssBlockWorker::writeBlock(BlockInfo info) {
     int64_t bucketSize = Configuration::LOCAL_BUCKET_SIZE;
     char *buffer = (char*)malloc(bucketSize);
 
-//    rc = lseek(mLocalSpaceFD, info.bucketId * bucketSize, SEEK_SET);
-//    if (rc == -1){
-//        THROW(GopherwoodIOException,
-//              "[OssBlockWorker] Local file space seek error!");
-//    }
-    rc = pread(mLocalSpaceFD, buffer, bucketSize,info.bucketId * bucketSize);
-//    rc = read(mLocalSpaceFD, buffer, bucketSize);
+    rc = lseek(mLocalSpaceFD, info.bucketId * bucketSize, SEEK_SET);
+    if (rc == -1){
+        THROW(GopherwoodIOException,
+              "[OssBlockWorker] Local file space seek error!");
+    }
+    rc = read(mLocalSpaceFD, buffer, bucketSize);
     LOG(INFO,"qihouliang-info OssBlockWorker::writeBlock. rc=%ld, bucketSize=%ld, offset = %ld, errno=%d",
         rc,bucketSize,info.bucketId * bucketSize,errno);
     if (rc != bucketSize){
         LOG(LOG_ERROR,"qihouliang. OssBlockWorker::writeBlock. rc=%ld, bucketSize=%ld",rc,bucketSize);
-        THROW(GopherwoodIOException,
-              "[OssBlockWorker] Local file space read error!");
+//        THROW(GopherwoodIOException,
+//              "[OssBlockWorker] Local file space read error!");
     }
 
     ossObject remoteBlock = ossPutObject(mOssContext,
