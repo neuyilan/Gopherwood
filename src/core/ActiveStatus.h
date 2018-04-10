@@ -87,6 +87,11 @@ public:
     void flush();
     void close();
 
+    /*added by qihouliang*/
+
+    void addNumReadMiss();
+    void addNumTotalRead();
+
     ~ActiveStatus();
 
 private:
@@ -120,6 +125,11 @@ private:
     uint32_t mNumEvicted;
     uint32_t mNumLoaded;
     uint32_t mNumActivated;
+
+    /*added by qihouliang*/
+    uint32_t mNumReadMiss;
+    uint32_t mNumTotalRead;
+
 
     bool mIsWrite;
     bool mIsDelete;

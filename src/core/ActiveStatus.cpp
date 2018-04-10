@@ -60,6 +60,8 @@ ActiveStatus::ActiveStatus(FileId fileId,
     mNumEvicted = 0;
     mNumLoaded = 0;
     mNumActivated = 0;
+    mNumTotalRead = 0;
+    mNumReadMiss = 0;
 
     SHARED_MEM_BEGIN
         registInSharedMem();
@@ -166,6 +168,8 @@ void ActiveStatus::getStatistics(GWFileInfo *fileInfo) {
     fileInfo->numActivated = mNumActivated;
     fileInfo->numEvicted = mNumEvicted;
     fileInfo->numLoaded = mNumLoaded;
+    fileInfo->numReadMiss = mNumReadMiss;
+    fileInfo->numTotalRead = mNumTotalRead;
 }
 
 void ActiveStatus::adjustActiveBlock(int curBlockId) {
@@ -474,7 +478,9 @@ void ActiveStatus::activateBlock(int blockId) {
             /* mark loading log */
             mManifest->logLoadBlock(block);
 
-        } else if (mBlockArray[blockId].state == BUCKET_USED ||
+            /*added by qihouliang*/
+            mNumReadMiss++;
+        } else if(mBlockArray[blockId].state == BUCKET_USED ||
                    mBlockArray[blockId].state == BUCKET_ACTIVE) {
             /* activate the block */
             /* inactivate first if LRUCache(Quota) is used up */
@@ -791,6 +797,13 @@ void ActiveStatus::catchUpManifestLogs() {
 
         blocks.clear();
     }
+}
+
+void ActiveStatus::addNumReadMiss(){
+    this->mNumReadMiss++;
+}
+void ActiveStatus::addNumTotalRead(){
+    this->mNumTotalRead++;
 }
 
 ActiveStatus::~ActiveStatus() {

@@ -51,6 +51,8 @@ void InputStream::read(char *buffer, int64_t length) {
         /* update BlockOutputStream, flush previous cached data
          * and switch to target block id & offset */
         if (needUpdate) {
+            /*added by qihouliang*/
+            mStatus->addNumTotalRead();
             updateBlockStream();
             needUpdate = false;
         }
