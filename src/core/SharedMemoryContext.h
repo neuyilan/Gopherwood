@@ -26,8 +26,9 @@
 #include "common/Memory.h"
 #include "core/BlockStatus.h"
 #include "core/SharedMemoryObj.h"
-
+#include <boost/thread/mutex.hpp>
 #include <boost/interprocess/mapped_region.hpp>
+#include <mutex>
 
 namespace Gopherwood {
 namespace Internal {
@@ -94,6 +95,8 @@ private:
     ShareMemHeader *header;
     ShareMemBucket *buckets;
     ShareMemActiveStatus *activeStatus;
+
+    boost::mutex mMutex;
 };
 
 }

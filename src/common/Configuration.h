@@ -40,6 +40,7 @@ public:
     static uint32_t PRE_ALLOCATE_BUCKET_NUM;
     static std::string DEFAULT_LOG_FILE_PATH;
 
+    static uint32_t NUMBER_OF_THREADS;
     static uint32_t getCurQuotaSize();
 };
 

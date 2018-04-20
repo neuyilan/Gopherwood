@@ -87,6 +87,7 @@ typedef struct GWFileInfo {
 	uint32_t numActivated;
 	uint32_t numReadMiss;
 	uint32_t numTotalRead;
+	uint32_t numWaitLoading;
 }GWFileInfo;
 /**
  * gwCreateContext - Connect to a gopherwood file system.

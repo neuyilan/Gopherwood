@@ -31,7 +31,7 @@
 #include "core/BlockStatus.h"
 #include "core/Manifest.h"
 #include "file/FileId.h"
-
+#include "common/ThreadPool.h"
 namespace Gopherwood {
 namespace Internal {
 
@@ -68,6 +68,8 @@ enum ActiveStatusType {
  */
 class ActiveStatus {
 public:
+    ActiveStatus();
+
     ActiveStatus(FileId fileId,
                  shared_ptr<SharedMemoryContext> sharedMemoryContext,
                  bool isCreate,
@@ -94,7 +96,12 @@ public:
 
     ~ActiveStatus();
 
-private:
+    void activateBlock(int blockId);
+
+    /*added by qihouliang, the thread pool*/
+    shared_ptr<ThreadPool> threadPool;
+
+public:
     void registInSharedMem();
     void unregistInSharedMem();
 
@@ -102,14 +109,13 @@ private:
     int32_t getNumBlocks();
     int64_t getCurBlockOffset();
     std::string getManifestFileName(FileId fileId);
-    bool isMyActiveBlock(int blockId);
+    int isMyActiveBlock(int blockId);
 
     /***** active status block manipulations *****/
     void catchUpManifestLogs();
     void adjustActiveBlock(int curBlockId);
     void acquireNewBlocks();
     void extendOneBlock();
-    void activateBlock(int blockId);
 
     void logEvictBlock(BlockInfo info);
 
@@ -129,6 +135,9 @@ private:
     /*added by qihouliang*/
     uint32_t mNumReadMiss;
     uint32_t mNumTotalRead;
+    uint32_t mNumWaitLoading;
+
+
 
 
     bool mIsWrite;

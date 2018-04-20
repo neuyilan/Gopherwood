@@ -91,10 +91,12 @@ void OssBlockWorker::readBlock(BlockInfo info) {
 
     ossCloseObject(mOssContext, remoteBlock);
     if (offset != bucketSize || bytesToRead !=0) {
-        THROW(GopherwoodIOException,
-              "[OssBlockWorker] Remote file size mismatch, expect %ld, but got %ld!",
-              bucketSize,
-              bytesRead);
+        LOG(LOG_ERROR,"qihouliang-info OssBlockWorker::readBlock. rc=%ld, bucketSize=%ld, bytesRead = %ld, errno=%d",
+            rc,bucketSize,bytesRead,errno);
+//        THROW(GopherwoodIOException,
+//              "[OssBlockWorker] Remote file size mismatch, expect %ld, but got %ld!",
+//              bucketSize,
+//              bytesRead);
     }
 
     rc = lseek(mLocalSpaceFD, info.bucketId * bucketSize, SEEK_SET);
@@ -105,8 +107,10 @@ void OssBlockWorker::readBlock(BlockInfo info) {
 
     rc = write(mLocalSpaceFD, buffer, bucketSize);
     if (rc != bucketSize){
-        THROW(GopherwoodIOException,
-              "[OssBlockWorker] Local file space read error!");
+        LOG(LOG_ERROR,"qihouliang-info ossblockworker::readblock. write. rc=%ld, bucketSize=%ld, bytesRead = %ld, errno=%d",
+            rc,bucketSize,bytesRead,errno);
+//        THROW(GopherwoodIOException,
+//              "[OssBlockWorker] Local file space read error!");
     }
     free(buffer);
     buffer = NULL;
@@ -115,8 +119,9 @@ void OssBlockWorker::readBlock(BlockInfo info) {
 void OssBlockWorker::deleteBlock(BlockInfo info) {
     int rc = ossDeleteObject(mOssContext, FileSystem::OSS_BUCKET.c_str(), getOssObjectName(info).c_str());
     if (rc == -1){
-        THROW(GopherwoodIOException,
-              "[OssBlockWorker] OSS file delete error!");
+        LOG(LOG_ERROR,"qihouliang-info OssBlockWorker::deleteBlock error. rc=%d",rc);
+//        THROW(GopherwoodIOException,
+//              "[OssBlockWorker] OSS file delete error!");
     }
 }
 

@@ -29,6 +29,8 @@
 namespace Gopherwood {
 namespace Internal {
 
+ActiveStatus::ActiveStatus(){};
+
 ActiveStatus::ActiveStatus(FileId fileId,
                            shared_ptr<SharedMemoryContext> sharedMemoryContext,
                            bool isCreate,
@@ -62,6 +64,10 @@ ActiveStatus::ActiveStatus(FileId fileId,
     mNumActivated = 0;
     mNumTotalRead = 0;
     mNumReadMiss = 0;
+    mNumWaitLoading=0;
+
+    /* init the thread pool */
+    threadPool = shared_ptr<ThreadPool>(new ThreadPool(Configuration::NUMBER_OF_THREADS));
 
     SHARED_MEM_BEGIN
         registInSharedMem();
@@ -133,8 +139,33 @@ std::string ActiveStatus::getManifestFileName(FileId fileId) {
     return ss.str();
 }
 
-bool ActiveStatus::isMyActiveBlock(int blockId) {
-    return mLRUCache->exists(blockId);
+/* return value:
+ * 0: is in the lruCache and have loaded;
+ * 1: is in the lruCache and is loading;
+ * 2: is not in the lrucache
+ * */
+int ActiveStatus::isMyActiveBlock(int blockId) {
+    int result = 0;
+
+    SHARED_MEM_BEGIN
+    bool isExist = mLRUCache->exists(blockId);
+    if(isExist){
+
+        bool isLoading =  mSharedMemoryContext->isBucketLoading(mBlockArray[blockId], mFileId);
+
+        if(isLoading){
+            result = 1;
+        }else{
+            result = 0;
+        }
+    }else{
+        result= 2;
+    }
+    SHARED_MEM_END
+
+    return result;
+
+
 }
 
 /* [IMPORTANT] This is the main entry point of adjusting active status. OutpuStream/InputStream
@@ -170,20 +201,106 @@ void ActiveStatus::getStatistics(GWFileInfo *fileInfo) {
     fileInfo->numLoaded = mNumLoaded;
     fileInfo->numReadMiss = mNumReadMiss;
     fileInfo->numTotalRead = mNumTotalRead;
+    fileInfo->numWaitLoading = mNumWaitLoading;
 }
+
+//inline void testThreadPool(int blockId){
+//    LOG(INFO,"qihouliang. [ActiveStatus]          |"
+//            "the input parameter blockId =%d",blockId);
+//    ActiveStatus * activeStatus = new ActiveStatus();
+//    activeStatus->activateBlock(blockId);
+//}
 
 void ActiveStatus::adjustActiveBlock(int curBlockId) {
     if (curBlockId + 1 > getNumBlocks()) {
         extendOneBlock();
-    } else if (!isMyActiveBlock(curBlockId)) {
-        /* all blocks not activated by me can not be trusted
-         * Need to lock Shared Memory and catch up logs */
+    } else{
+
+        int isActive  = isMyActiveBlock(curBlockId);
+
+        if(isActive==0){
+            return;
+        }else if(isActive==1){
+            mNumWaitLoading++;
+            bool stillLoading = true;
+
+            while (true) {
+                LOG(INFO,"qihouliang.[adjustActiveBlock]          |"
+                        "the return value isActive==1, so come in the while true loop code.");
+                sleep(1);
+                SHARED_MEM_BEGIN
+                    stillLoading = mSharedMemoryContext->isBucketLoading(mBlockArray[curBlockId], mFileId);
+                SHARED_MEM_END
+
+                if (!stillLoading) {
+                    break;
+                }
+            }
+
+        }else if(isActive==2){
+
+            /*added by qihouliang*/
+            SHARED_MEM_BEGIN
+            if(!mBlockArray[curBlockId].isLocal){
+                mNumReadMiss++;
+            }
+            SHARED_MEM_END
+
+            activateBlock(curBlockId);
+
+            /* use the thread pool to active the next flowing NUMBER_OF_THREADS buckets */
+            int64_t maxBlockId = getEof()/Configuration::LOCAL_BUCKET_SIZE;
+            int tmpCount = 0;
+            int tmpBlockId = curBlockId+1;
+
+
+            /* the thread pool code*/
+            while(tmpCount<Configuration::NUMBER_OF_THREADS && tmpBlockId<=maxBlockId){
+                LOG(INFO,"[qihouliang. ActiveStatus]           |"
+                        "come in the thread pool method, and the active block id=%d, the maxBlockId=%d", tmpBlockId, maxBlockId);
+                threadPool->enqueue([tmpBlockId,this] {activateBlock(tmpBlockId);});
+                tmpBlockId++;
+                tmpCount++;
+            }
+
+        }else{
+           THROW(GopherwoodException, "[ActiveStatus] block active status mismatch!");
+        }
+    }
+
+   /* if (!isMyActiveBlock(curBlockId)) {
+        *//* all blocks not activated by me can not be trusted
+         * Need to lock Shared Memory and catch up logs *//*
         activateBlock(curBlockId);
+
+        *//* use the thread pool to active the next flowing NUMBER_OF_THREADS buckets *//*
+        int64_t maxBlockId = getEof()/Configuration::LOCAL_BUCKET_SIZE;
+        int tmpCount = 0;
+        int tmpBlockId = curBlockId+1;
+
+        while (mPreAllocatedBuckets.size() < Configuration::NUMBER_OF_THREADS) {
+            LOG(INFO,"[qihouliang. ActiveStatus]           |"
+                    "mPreAllocatedBuckets.size is smaller than NUMBER_OF_THREADS, "
+                    "the mPreAllocatedBuckets.size=%d, and the NUMBER_OF_THREADS=%d.", mPreAllocatedBuckets.size(),Configuration::NUMBER_OF_THREADS);
+            acquireNewBlocks();
+        }
+
+        while(tmpCount<Configuration::NUMBER_OF_THREADS && tmpBlockId<=maxBlockId){
+            LOG(INFO,"[qihouliang. ActiveStatus]           |"
+                    "come in the thread pool method, and the active block id=%d, the maxBlockId=%d", tmpBlockId, maxBlockId);
+
+            threadPool->enqueue([tmpBlockId,this] {activateBlock(tmpBlockId);});
+
+//            threadPool->enqueue(activateBlock(tmpBlockId));
+            tmpBlockId++;
+            tmpCount++;
+        }
+
     } else {
         if (!mLRUCache->exists(curBlockId)) {
             THROW(GopherwoodException, "[ActiveStatus] block active status mismatch!");
         }
-    }
+    }*/
 }
 
 /* All block activation should follow these steps:
@@ -215,7 +332,7 @@ void ActiveStatus::acquireNewBlocks() {
     uint32_t numAvailable;
 
     SHARED_MEM_BEGIN
-        uint32_t quota = mSharedMemoryContext->calcDynamicQuotaNum();
+        uint32_t quota = mSharedMemoryContext->calcDynamicQuotaNum()-mPreAllocatedBuckets.size();
         numFreeBuckets = mSharedMemoryContext->getFreeBucketNum();
         numUsedBuckets = mSharedMemoryContext->getUsedBucketNum();
         numAvailable = numFreeBuckets + numUsedBuckets;
@@ -226,12 +343,16 @@ void ActiveStatus::acquireNewBlocks() {
          ************************************************/
         if (mLRUCache->size() < quota) {
             if (numAvailable > 0) {
+
                 /* 2(a) acquire more buckets for preAllocatedBlocks */
                 uint32_t tmpAcquire = quota - mLRUCache->size();
                 if (tmpAcquire > Configuration::PRE_ALLOCATE_BUCKET_NUM) {
                     tmpAcquire = Configuration::PRE_ALLOCATE_BUCKET_NUM;
                 }
                 numToAcquire = numAvailable > tmpAcquire ? tmpAcquire : numAvailable;
+                LOG(INFO,"qihouliang. ActiveStatus::acquireNewBlocks|"
+                        "Configuration::PRE_ALLOCATE_BUCKET_NUM=%d, numToAcquire=%d, tmpAcquire=%d",
+                    Configuration::PRE_ALLOCATE_BUCKET_NUM, numToAcquire, tmpAcquire);
                 /* it might exceed quota after acquired new buckets */
                 numToInactivate = (mLRUCache->size() + numToAcquire) > quota ?
                                    mLRUCache->size() + numToAcquire - quota : 0;
@@ -446,6 +567,8 @@ void ActiveStatus::extendOneBlock() {
 
 /* active a block back to my control */
 void ActiveStatus::activateBlock(int blockId) {
+    LOG(INFO,"qihouliang.[ActiveStatus]          |"
+            "blockId=%d",blockId);
     bool loadBlock = false;
     int rc = -1;
 
@@ -471,6 +594,7 @@ void ActiveStatus::activateBlock(int blockId) {
             mSharedMemoryContext->markBucketLoading(block, mActiveId, mFileId);
             block.state = BUCKET_ACTIVE;
 
+            /* the data is not load from OSS*/
             /* add to LRU cache */
             mLRUCache->put(block.blockId, block.bucketId);
             /* update block info */
@@ -478,8 +602,6 @@ void ActiveStatus::activateBlock(int blockId) {
             /* mark loading log */
             mManifest->logLoadBlock(block);
 
-            /*added by qihouliang*/
-            mNumReadMiss++;
         } else if(mBlockArray[blockId].state == BUCKET_USED ||
                    mBlockArray[blockId].state == BUCKET_ACTIVE) {
             /* activate the block */
@@ -509,6 +631,12 @@ void ActiveStatus::activateBlock(int blockId) {
                                                       mBlockArray[blockId],
                                                       mActiveId,
                                                       mIsWrite);
+            if(rc==2){
+                LOG(INFO,"qihouliang.[ActiveStatus]          |"
+                        "rc=2, so wait for the other process to finish");
+                mNumWaitLoading++;
+            }
+
             /* the block is activated by me */
             if (rc == 1) {
                 mManifest->logActivateBucket(mBlockArray[blockId]);
@@ -531,7 +659,10 @@ void ActiveStatus::activateBlock(int blockId) {
         info.isLocal = false;
         info.offset = InvalidBlockOffset;
 
+        LOG(INFO,"qihouliang. ActiveStatus::activateBlock|"
+                "blockId=%d, bucketId=%d", blockId, mBlockArray[blockId].bucketId);
         mOssWorker->readBlock(info);
+
 
         /* delete the remote block */
         BlockInfo deleteBlockinfo;
@@ -545,14 +676,20 @@ void ActiveStatus::activateBlock(int blockId) {
             mSharedMemoryContext->markLoadFinish(mBlockArray[blockId], mActiveId, mFileId);
             /* update statistics */
             mNumLoaded++;
+
         SHARED_MEM_END
+
+        LOG(INFO,"qihouliang. ActiveStatus::activateBlock|"
+                "evict finished");
     }
     /* if the block is loading by other process, wait until it finished */
     if (rc == 2) {
         bool stillLoading = true;
 
         while (true) {
-            sleep(5000);
+            LOG(INFO,"qihouliang.[ActiveStatus]          |"
+                    "the return value rc=2, so come in the while true loop code.");
+            sleep(1);
             SHARED_MEM_BEGIN
                 stillLoading = mSharedMemoryContext->isBucketLoading(mBlockArray[blockId], mFileId);
             SHARED_MEM_END

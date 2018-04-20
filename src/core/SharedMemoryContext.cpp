@@ -60,13 +60,19 @@ void SharedMemoryContext::reset() {
 }
 
 void SharedMemoryContext::lock() {
-    lockf(mLockFD, F_LOCK, 0);
+    mMutex.lock();
+//    lockf(mLockFD, F_LOCK, 0);
+    LOG(INFO,"qihouliang.SharedMemoryContext| "
+            "come in the lock method");
     header->enter();
 }
 
 void SharedMemoryContext::unlock() {
     header->exit();
-    lockf(mLockFD, F_ULOCK, 0);
+    LOG(INFO,"qihouliang.SharedMemoryContext| "
+            "come in the unlock method");
+//    lockf(mLockFD, F_ULOCK, 0);
+    mMutex.unlock();
 }
 
 int SharedMemoryContext::regist(int pid, FileId fileId, bool isWrite, bool isDelete) {

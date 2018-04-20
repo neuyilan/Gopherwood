@@ -19,6 +19,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <common/Configuration.h>
 #include "file/InputStream.h"
 
 namespace Gopherwood {
@@ -53,6 +54,7 @@ void InputStream::read(char *buffer, int64_t length) {
         if (needUpdate) {
             /*added by qihouliang*/
             mStatus->addNumTotalRead();
+
             updateBlockStream();
             needUpdate = false;
         }
