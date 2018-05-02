@@ -42,8 +42,6 @@ std::string Configuration::DEFAULT_LOG_FILE_PATH("/media/ephemeral0/gopherwood.l
 
 uint32_t Configuration::NUMBER_OF_THREADS = 2;
 
-std::string Configuration::DEFAULT_LOG_FILE_PATH("/media/ephemeral0/gopherwood.log");
-
 uint32_t Configuration::getCurQuotaSize(){
     return Configuration::NUMBER_OF_BLOCKS/Configuration::CUR_CONNECTION;
 }

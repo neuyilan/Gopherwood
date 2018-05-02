@@ -248,20 +248,20 @@ void ActiveStatus::adjustActiveBlock(int curBlockId) {
 
             activateBlock(curBlockId);
 
-            /* use the thread pool to active the next flowing NUMBER_OF_THREADS buckets */
-            int64_t maxBlockId = getEof()/Configuration::LOCAL_BUCKET_SIZE;
-            int tmpCount = 0;
-            int tmpBlockId = curBlockId+1;
-
-
-            /* the thread pool code*/
-            while(tmpCount<Configuration::NUMBER_OF_THREADS && tmpBlockId<=maxBlockId){
-                LOG(INFO,"[qihouliang. ActiveStatus]           |"
-                        "come in the thread pool method, and the active block id=%d, the maxBlockId=%d", tmpBlockId, maxBlockId);
-                threadPool->enqueue([tmpBlockId,this] {activateBlock(tmpBlockId);});
-                tmpBlockId++;
-                tmpCount++;
-            }
+//            /* use the thread pool to active the next flowing NUMBER_OF_THREADS buckets */
+//            int64_t maxBlockId = getEof()/Configuration::LOCAL_BUCKET_SIZE;
+//            int tmpCount = 0;
+//            int tmpBlockId = curBlockId+1;
+//
+//
+//            /* the thread pool code*/
+//            while(tmpCount<Configuration::NUMBER_OF_THREADS && tmpBlockId<=maxBlockId){
+//                LOG(INFO,"[qihouliang. ActiveStatus]           |"
+//                        "come in the thread pool method, and the active block id=%d, the maxBlockId=%d", tmpBlockId, maxBlockId);
+//                threadPool->enqueue([tmpBlockId,this] {activateBlock(tmpBlockId);});
+//                tmpBlockId++;
+//                tmpCount++;
+//            }
 
         }else{
            THROW(GopherwoodException, "[ActiveStatus] block active status mismatch!");
