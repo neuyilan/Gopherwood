@@ -170,11 +170,17 @@ void Manifest::logLoadBlock(Block &block) {
 
 void Manifest::logFullStatus(std::vector<Block> &blocks, RecOpaque opaque) {
     /* truncate existing Manifest file */
+    LOG(INFO,"qihouliang.[Manifest::logFullStatus]          |"
+            "Manifest::logFullStatus. start mfTruncate.");
     mfTruncate();
 
+    LOG(INFO,"qihouliang.[Manifest::logFullStatus]          |"
+            "Manifest::logFullStatus. end mfTruncate.");
     /* build log record */
     std::string logRecord = serializeManifestLog(blocks, RecordType::fullStatus, opaque);
 
+    LOG(INFO,"qihouliang.[Manifest::logFullStatus]          |"
+            "Manifest::logFullStatus. have return the logRecord.");
     /* flush to log */
     mfWrite(logRecord);
     LOG(INFO, "[Manifest]              |"
@@ -265,6 +271,8 @@ std::string Manifest::serializeManifestLog(std::vector<Block> &blocks, RecordTyp
               "[Manifest::serializeManifestLog] Broken log record, expect_size=%lu, actual_size=%lu",
               header.recordLength, logRecord.size());
     }
+    LOG(INFO,"qihouliang.[Manifest::serializeManifestLog]          |"
+            "Manifest::serializeManifestLog. 111111111111111111111111111.");
 
     return logRecord;
 }

@@ -67,7 +67,7 @@ ActiveStatus::ActiveStatus(FileId fileId,
     mNumWaitLoading=0;
 
     /* init the thread pool */
-    threadPool = shared_ptr<ThreadPool>(new ThreadPool(Configuration::NUMBER_OF_THREADS));
+//    threadPool = shared_ptr<ThreadPool>(new ThreadPool(Configuration::NUMBER_OF_THREADS));
 
     SHARED_MEM_BEGIN
         registInSharedMem();
@@ -797,6 +797,8 @@ void ActiveStatus::close() {
                 /* truncate existing Manifest file and flush latest block status to it.
                  * NOTES: Only do the Manifest log shrinking if nobody is opening
                  * this file. */
+                LOG(INFO,"qihouliang.[ActiveStatus]          |"
+                        "start write the logFullStatus.");
                 RecOpaque opaque;
                 opaque.fullStatus.eof = mEof;
                 mManifest->logFullStatus(mBlockArray, opaque);
