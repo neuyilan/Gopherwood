@@ -67,7 +67,7 @@ ActiveStatus::ActiveStatus(FileId fileId,
     mNumWaitLoading=0;
 
     /* init the thread pool */
-//    threadPool = shared_ptr<ThreadPool>(new ThreadPool(Configuration::NUMBER_OF_THREADS));
+    threadPool = shared_ptr<ThreadPool>(new ThreadPool(Configuration::NUMBER_OF_THREADS));
 
     SHARED_MEM_BEGIN
         registInSharedMem();
@@ -93,9 +93,11 @@ void ActiveStatus::unregistInSharedMem() {
     int rc = mSharedMemoryContext->unregist(mActiveId, getpid(), &mShouldDestroy);
     if (rc != 0) {
         mSharedMemoryContext->unlock();
-        THROW(GopherwoodSharedMemException,
-              "[ActiveStatus::unregistInSharedMem] connection info mismatch with SharedMem ActiveId=%d, PID=%d",
-              mActiveId, getpid());
+        LOG(LOG_ERROR,"qihouliang. [ActiveStatus::unregistInSharedMem] connection info mismatch with SharedMem ActiveId=%d, PID=%d",
+            mActiveId, getpid());
+//        THROW(GopherwoodSharedMemException,
+//              "[ActiveStatus::unregistInSharedMem] connection info mismatch with SharedMem ActiveId=%d, PID=%d",
+//              mActiveId, getpid());
     }
     LOG(INFO, "[ActiveStatus]          |"
             "Unregistered successfully, ActiveID=%d, PID=%d", mActiveId, getpid());
@@ -248,12 +250,12 @@ void ActiveStatus::adjustActiveBlock(int curBlockId) {
 
             activateBlock(curBlockId);
 
-//            /* use the thread pool to active the next flowing NUMBER_OF_THREADS buckets */
-//            int64_t maxBlockId = getEof()/Configuration::LOCAL_BUCKET_SIZE;
-//            int tmpCount = 0;
-//            int tmpBlockId = curBlockId+1;
-//
-//
+            /* use the thread pool to active the next flowing NUMBER_OF_THREADS buckets */
+            int64_t maxBlockId = getEof()/Configuration::LOCAL_BUCKET_SIZE;
+            int tmpCount = 0;
+            int tmpBlockId = curBlockId+1;
+
+
 //            /* the thread pool code*/
 //            while(tmpCount<Configuration::NUMBER_OF_THREADS && tmpBlockId<=maxBlockId){
 //                LOG(INFO,"[qihouliang. ActiveStatus]           |"

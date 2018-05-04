@@ -60,8 +60,8 @@ void SharedMemoryContext::reset() {
 }
 
 void SharedMemoryContext::lock() {
+    lockf(mLockFD, F_LOCK, 0);
     mMutex.lock();
-//    lockf(mLockFD, F_LOCK, 0);
     LOG(INFO,"qihouliang.SharedMemoryContext| "
             "come in the lock method");
     header->enter();
@@ -71,8 +71,8 @@ void SharedMemoryContext::unlock() {
     header->exit();
     LOG(INFO,"qihouliang.SharedMemoryContext| "
             "come in the unlock method");
-//    lockf(mLockFD, F_ULOCK, 0);
     mMutex.unlock();
+    lockf(mLockFD, F_ULOCK, 0);
 }
 
 int SharedMemoryContext::regist(int pid, FileId fileId, bool isWrite, bool isDelete) {
@@ -349,10 +349,12 @@ void SharedMemoryContext::releaseBuckets(std::list<Block> &blocks) {
             header->numActiveBuckets--;
             header->numFreeBuckets++;
         } else {
-            THROW(
-                    GopherwoodSharedMemException,
-                    "[SharedMemoryContext::releaseBlock] state of bucket %d is not Active",
+            LOG(LOG_ERROR,"qihouliang. [SharedMemoryContext::releaseBlock] state of bucket %d is not Active",
                     bucketId);
+//            THROW(
+//                    GopherwoodSharedMemException,
+//                    "[SharedMemoryContext::releaseBlock] state of bucket %d is not Active",
+//                    bucketId);
         }
     }
     LOG(INFO, "[SharedMemoryContext]   |"

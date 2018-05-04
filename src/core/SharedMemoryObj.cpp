@@ -57,10 +57,12 @@ void ShareMemBucket::reset() {
 
 void ShareMemBucket::markWrite(int activeId) {
     if (writeActiveId != InvalidActiveId) {
-        THROW(GopherwoodSharedMemException,
-              "[ShareMemBucket::markWrite] File %lu-%u exceed the max write concurrent num %d",
-              fileId.hashcode, fileId.collisionId, 1
-        );
+        LOG(LOG_ERROR,"qihouliang [ShareMemBucket::markWrite] File %lu-%u exceed the max write concurrent num %d",
+              fileId.hashcode, fileId.collisionId, 1);
+//        THROW(GopherwoodSharedMemException,
+//              "[ShareMemBucket::markWrite] File %lu-%u exceed the max write concurrent num %d",
+//              fileId.hashcode, fileId.collisionId, 1
+//        );
     }
     writeActiveId = activeId;
 };

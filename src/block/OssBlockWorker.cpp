@@ -49,8 +49,8 @@ void OssBlockWorker::writeBlock(BlockInfo info) {
         rc,bucketSize,info.bucketId * bucketSize,errno);
     if (rc != bucketSize){
         LOG(LOG_ERROR,"qihouliang. OssBlockWorker::writeBlock. rc=%ld, bucketSize=%ld",rc,bucketSize);
-//        THROW(GopherwoodIOException,
-//              "[OssBlockWorker] Local file space read error!");
+        THROW(GopherwoodIOException,
+              "[OssBlockWorker] Local file space read error!");
     }
 
     ossObject remoteBlock = ossPutObject(mOssContext,
@@ -109,8 +109,8 @@ void OssBlockWorker::readBlock(BlockInfo info) {
     if (rc != bucketSize){
         LOG(LOG_ERROR,"qihouliang-info ossblockworker::readblock. write. rc=%ld, bucketSize=%ld, bytesRead = %ld, errno=%d",
             rc,bucketSize,bytesRead,errno);
-//        THROW(GopherwoodIOException,
-//              "[OssBlockWorker] Local file space read error!");
+        THROW(GopherwoodIOException,
+              "[OssBlockWorker] Local file space read error!");
     }
     free(buffer);
     buffer = NULL;
@@ -120,8 +120,8 @@ void OssBlockWorker::deleteBlock(BlockInfo info) {
     int rc = ossDeleteObject(mOssContext, FileSystem::OSS_BUCKET.c_str(), getOssObjectName(info).c_str());
     if (rc == -1){
         LOG(LOG_ERROR,"qihouliang-info OssBlockWorker::deleteBlock error. rc=%d",rc);
-//        THROW(GopherwoodIOException,
-//              "[OssBlockWorker] OSS file delete error!");
+        THROW(GopherwoodIOException,
+              "[OssBlockWorker] OSS file delete error!");
     }
 }
 

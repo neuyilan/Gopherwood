@@ -40,7 +40,7 @@ uint32_t Configuration::PRE_ALLOCATE_BUCKET_NUM = 4;
 
 std::string Configuration::DEFAULT_LOG_FILE_PATH("/media/ephemeral0/gopherwood.log");
 
-uint32_t Configuration::NUMBER_OF_THREADS = 2;
+uint32_t Configuration::NUMBER_OF_THREADS = 1;
 
 uint32_t Configuration::getCurQuotaSize(){
     return Configuration::NUMBER_OF_BLOCKS/Configuration::CUR_CONNECTION;
