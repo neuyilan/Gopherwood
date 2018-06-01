@@ -122,6 +122,6 @@ set(SOURCE_FILES
 		src/core/BlockStatus.cpp
 		src/core/BlockStatus.cpp
 		src/block/BlockInputStream.h
-		src/block/BlockInputStream.cpp test/function/TestMultiOpenWrite.cpp)
+		src/block/BlockInputStream.cpp test/function/TestMultiOpenWrite.cpp test/function/TestOSSReadWrite.cpp)
 
 add_executable(gopherwood ${SOURCE_FILES})

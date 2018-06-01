@@ -54,15 +54,15 @@ static void InitProcessId() {
     snprintf(ProcessId, sizeof(ProcessId), "%s", ss.str().c_str());
 }
 
-//Logger::Logger() :
-//        fd(STDERR_FILENO), severity(DEFAULT_LOG_LEVEL) {
-//}
-
-Logger::Logger(){
-    severity = DEFAULT_LOG_LEVEL;
-    int flags = O_CREAT | O_RDWR | O_APPEND;
-    fd = open(Configuration::DEFAULT_LOG_FILE_PATH.c_str(),flags,0644);
+Logger::Logger() :
+        fd(STDERR_FILENO), severity(DEFAULT_LOG_LEVEL) {
 }
+
+//Logger::Logger(){
+//    severity = DEFAULT_LOG_LEVEL;
+//    int flags = O_CREAT | O_RDWR | O_APPEND;
+//    fd = open(Configuration::DEFAULT_LOG_FILE_PATH.c_str(),flags,0644);
+//}
 
 Logger::~Logger() {
 }
