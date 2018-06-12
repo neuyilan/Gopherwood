@@ -20,19 +20,23 @@ gopherwoodFS gwFS;
 
 void initContext() {
     GWContextConfig config;
-    config.blockSize = 1024;
-    config.numBlocks = 10;
+    config.blockSize = 6*1024*1024;
+    config.numBlocks = 100;
+//    config.blockSize = 1*1024;
+//    config.numBlocks = 10;
     config.numPreDefinedConcurrency = 2;
     config.severity = 3;
     gwFS = gwCreateContext(workspace, &config);
 }
 
 void testGWWrite(std::string fileName) {
+    std:cout << "hello word" <<std::endl;
     initContext();
     gwFile file = gwOpenFile(gwFS, (char *) fileName.c_str(), GW_CREAT | GW_RDWR);
 
-    int SIZE = 128;
+    int SIZE = 1*1024*1024;
 
+//    int SIZE = 128;
     //3. construct the file name
     std::stringstream ss;
     ss << dataDir << fileName;
@@ -49,14 +53,14 @@ void testGWWrite(std::string fileName) {
     int readLengthIn = infile.gcount();
     while (readLengthIn > 0) {
         totalWriteLength += readLengthIn;
-        std::cout << "totalWriteLength=" << totalWriteLength << ",readLength="
-                  << readLengthIn << std::endl;
-        std::cout << "buf=" << buf << std::endl;
+//        std::cout << "totalWriteLength=" << totalWriteLength << ",readLength="
+//                  << readLengthIn << std::endl;
+//        std::cout << "buf=" << buf << std::endl;
         //5. write data to the gopherwood
-        std::cout << "readLengthIn=" << readLengthIn << std::endl;
+//        std::cout << "readLengthIn=" << readLengthIn << std::endl;
         gwWrite(gwFS, file, buf, readLengthIn);
 
-        std::cout << "come in =" << readLengthIn << std::endl;
+//        std::cout << "come in =" << readLengthIn << std::endl;
 
         buf = new char[SIZE];
         infile.read(buf, SIZE);
@@ -90,8 +94,9 @@ void testGWRead(string fileName) {
     std::string fileNameForWrite = ss.str();
 
 
-    int SIZE = 128;
+    int SIZE = 1*1024*1024;
 
+//    int SIZE = 128;
     char *readBuf = new char[SIZE];
     int readLength = gwRead(gwFS, file, readBuf, SIZE);
 
@@ -103,7 +108,7 @@ void testGWRead(string fileName) {
 
         readBuf = new char[SIZE];
         readLength = gwRead(gwFS, file, readBuf, SIZE);
-        std::cout << "**************** readLength =  *******************" << readLength << std::endl;
+//        std::cout << "**************** readLength =  *******************" << readLength << std::endl;
     }
 
 
