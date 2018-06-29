@@ -24,6 +24,7 @@ void initContext() {
     config.numBlocks = 100;
 //    config.blockSize = 1*1024;
 //    config.numBlocks = 10;
+
     config.numPreDefinedConcurrency = 2;
     config.severity = 3;
     gwFS = gwCreateContext(workspace, &config);
